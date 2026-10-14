@@ -87,6 +87,24 @@ def run(url: str, screenshot: str | None):
         # Verify transition to completed status
         expect(page.locator(".completeness-badge")).to_contain_text("open claims reviewed", timeout=30000)
 
+        # Verify Overview tab operational components
+        expect(page.locator(".snapshot-grid")).to_be_visible()
+        expect(page.locator(".timeline-card-panel")).to_be_visible()
+        expect(page.get_by_role("button", name="Export AI Brief (PDF)", exact=True)).to_be_visible()
+        expect(page.get_by_role("button", name="Print View", exact=True)).to_be_visible()
+        expect(page.locator("#printable-ai-brief")).to_have_count(1)
+
+        # Tab navigation check: Switch to dedicated AI Brief tab
+        page.get_by_role("button", name="AI Brief", exact=True).click()
+        expect(page.locator(".agenda-panel")).to_be_visible()
+        expect(page.locator(".talking-points-panel")).to_be_visible()
+        expect(page.locator(".timeline-card-panel")).not_to_be_visible()
+
+        # Switch back to Overview tab
+        page.get_by_role("button", name="Overview", exact=True).click()
+        expect(page.locator(".timeline-card-panel")).to_be_visible()
+        expect(page.locator(".agenda-panel")).not_to_be_visible()
+
         # RBAC checks
         assert page.request.get(url + "/accounts/A05/documents").status == 403
         assert page.request.get(url + "/accounts/A05/brief?user_id=U2").status == 403

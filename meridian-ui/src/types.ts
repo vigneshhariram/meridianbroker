@@ -85,7 +85,13 @@ export type DocumentItem = {
 }
 
 export type DetailTab =
-  'overview' | 'policies' | 'claims' | 'billing' | 'service-cases' | 'documents'
+  | 'overview'
+  | 'ai-brief'
+  | 'policies'
+  | 'claims'
+  | 'billing'
+  | 'service-cases'
+  | 'documents'
 export type AccountDetail = Policy | Claim | Billing | ServiceCase | DocumentItem
 
 export type Evidence = {
@@ -207,5 +213,12 @@ export type AccountBrief = {
     omitted?: string | null
   }
   permissions: Record<string, boolean>
-  timeline: { event_id: string; event_date: string; title: string; event_type: string }[]
+  timeline: {
+    event_id: string
+    event_date: string
+    title: string
+    event_type: string
+    ref_table?: string | null
+    ref_id?: string | null
+  }[]
 }

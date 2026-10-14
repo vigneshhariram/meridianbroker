@@ -37,7 +37,7 @@ export function AccountDetailsPanel({
   error,
 }: {
   accountName: string
-  tab: Exclude<DetailTab, 'overview'>
+  tab: Exclude<DetailTab, 'overview' | 'ai-brief'>
   items: AccountDetail[] | null
   loading: boolean
   error: string

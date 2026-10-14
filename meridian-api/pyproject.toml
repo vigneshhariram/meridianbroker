@@ -1,0 +1,53 @@
+[project]
+name = "meridian-api"
+version = "0.1.0"
+description = "Meridian Broker API service"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.0",
+    "uvicorn[standard]>=0.54.0",
+    "openai>=1.50.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line length violations (handled by ruff format)
+    "B008",   # function call in argument defaults (FastAPI Depends/Query)
+    "SIM108", # ternary operator suggestions
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

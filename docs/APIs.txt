@@ -1,0 +1,14 @@
+APIs
+
+
+GET /accounts: returns all accounts from the accounts table, including risk level and premium.
+GET /accounts/{id}/brief: the page payload. It bundles account info, the snapshot, milestones, commitments, risks, opportunities, contradictions and the latest brief text.
+GET /accounts/{id}/policies: returns policies associated with the account.
+GET /accounts/{id}/claims, /accounts/{id}/service-cases, /accounts/{id}/documents: the tab views.
+
+????
+GET /portfolio: regional leader aggregates.
+POST /copilot/ask: question in, answer with citations out.
+POST /actions, PATCH /actions/{id}: draft, approve or reject.
+POST /feedback: thumbs and corrections.
+GET /admin/audit: prompts, tokens, cost, latency

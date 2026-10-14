@@ -1144,32 +1144,6 @@
   }
 }
 
-@media print {
-  :root {
-    background: #fff;
-  }
-
-  .topbar,
-  .left-rail,
-  .export-button,
-  .right-rail {
-    display: none !important;
-  }
-
-  .dashboard {
-    display: block;
-    padding: 0;
-  }
-
-  .main-column {
-    gap: 8px;
-  }
-
-  .panel {
-    break-inside: avoid;
-    box-shadow: none;
-  }
-}
 
 .brand-name {
   font-size: 20px;
@@ -1758,41 +1732,569 @@
   font-family: monospace;
   overflow-x: auto;
 }
+/* Printable Brief Container (Screen: Hidden) */
+.printable-brief-container {
+  display: none;
+}
+
+/* Operational Snapshot Quick Action */
+.card-quick-action {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.card-quick-action:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+/* AI Overview Callout */
+.ai-overview-callout {
+  padding: 12px 14px;
+  margin-top: 10px;
+  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+  border: 1px solid #e2e8f0;
+}
+
+.ai-callout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ai-callout-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-brief-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1e3a8a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.ai-callout-status {
+  font-size: 11px;
+  color: #334155;
+  font-weight: 500;
+}
+
+.telemetry-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.ai-jump-btn {
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e3a8a;
+  border-color: #93c5fd;
+  background: #ffffff;
+}
+
+.ai-jump-btn:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+/* Relationship Journey Timeline Panel */
+.timeline-card-panel {
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+
+.timeline-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timeline-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 11.5px;
+}
+
+.timeline-date {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.timeline-type-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.timeline-type-badge.claim_opened {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.timeline-type-badge.meeting {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.timeline-type-badge.service_escalation,
+.timeline-type-badge.service_case {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.timeline-type-badge.billing_overdue,
+.timeline-type-badge.commitment_overdue {
+  background: #fde8e7;
+  color: #b53831;
+}
+
+.timeline-type-badge.endorsement_requested {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.timeline-title {
+  flex: 1;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.timeline-ref-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9.5px;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.tab-sparkle-icon {
+  color: #2563eb;
+}
+
+.export-ai-brief-button {
+  background: #1e3a8a;
+  border-color: #1e3a8a;
+  color: #ffffff;
+}
+
+.export-ai-brief-button:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+}
+
+.print-view-button {
+  background: #ffffff;
+}
+
+/* ========================================================== */
+/* CONSOLIDATED PRINT STYLES                                  */
+/* ========================================================== */
+
 @media print {
-  body {
+  /* 1. Dedicated AI Brief PDF Print: body.printing-ai-brief */
+  body.printing-ai-brief {
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .left-rail,
-  .right-rail,
-  .detail-tabs,
-  .workspace-notice,
-  .header-controls,
-  .export-button {
+
+  body.printing-ai-brief .app-shell,
+  body.printing-ai-brief .topbar,
+  body.printing-ai-brief .dashboard,
+  body.printing-ai-brief .left-rail,
+  body.printing-ai-brief .right-rail,
+  body.printing-ai-brief .main-column,
+  body.printing-ai-brief .error-banner {
     display: none !important;
   }
-  .app-shell {
+
+  body.printing-ai-brief .printable-brief-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 270mm !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  body.printing-ai-brief .printable-brief-sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.3 !important;
+  }
+
+  body.printing-ai-brief .print-header {
+    border-bottom: 2px solid #1e3a8a !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-header-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 7.5pt !important;
+    color: #475569 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-brand strong {
+    color: #1e3a8a !important;
+    font-weight: 800 !important;
+  }
+
+  body.printing-ai-brief .print-header-main {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  body.printing-ai-brief .print-client-name {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-size: 14pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    line-height: 1.15 !important;
+  }
+
+  body.printing-ai-brief .print-client-sub {
+    font-size: 8pt !important;
+    color: #64748b !important;
+    margin: 2px 0 0 !important;
+  }
+
+  body.printing-ai-brief .print-kpi-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+
+  body.printing-ai-brief .print-kpi-chip {
+    font-size: 7.5pt !important;
+    padding: 2px 5px !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+    color: #1e293b !important;
+    white-space: nowrap !important;
+  }
+
+  body.printing-ai-brief .print-kpi-chip.risk-high {
+    background: #fee2e2 !important;
+    border-color: #fca5a5 !important;
+    color: #991b1b !important;
+  }
+
+  body.printing-ai-brief .print-kpi-chip.risk-medium {
+    background: #fef3c7 !important;
+    border-color: #fde68a !important;
+    color: #92400e !important;
+  }
+
+  body.printing-ai-brief .print-kpi-chip.risk-low {
+    background: #dcfce7 !important;
+    border-color: #86efac !important;
+    color: #166534 !important;
+  }
+
+  body.printing-ai-brief .print-completeness-strip {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    font-size: 7.5pt !important;
+  }
+
+  body.printing-ai-brief .print-completeness-strip.complete {
+    background: #ecfdf5 !important;
+    border: 1px solid #a7f3d0 !important;
+    color: #065f46 !important;
+  }
+
+  body.printing-ai-brief .print-completeness-strip.alert {
+    background: #fffbeb !important;
+    border: 1px solid #fde68a !important;
+    color: #92400e !important;
+  }
+
+  body.printing-ai-brief .print-telemetry-text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+    font-size: 7pt !important;
+    color: #475569 !important;
+  }
+
+  body.printing-ai-brief .print-section {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 4px !important;
+    padding: 4px 7px !important;
+    background: #ffffff !important;
+    break-inside: avoid !important;
+  }
+
+  body.printing-ai-brief .print-section-title {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    color: #1e3a8a !important;
+    margin: 0 0 2px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-summary-body {
+    font-size: 8pt !important;
+    line-height: 1.35 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+  }
+
+  body.printing-ai-brief .print-citations-line {
+    margin-top: 2px !important;
+    font-size: 7pt !important;
+    color: #64748b !important;
+  }
+
+  body.printing-ai-brief .print-cite-label {
+    font-weight: 700 !important;
+    margin-right: 4px !important;
+  }
+
+  body.printing-ai-brief .print-cite-items {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
+    color: #1d4ed8 !important;
+  }
+
+  body.printing-ai-brief .print-two-col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+  }
+
+  body.printing-ai-brief .print-col {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+  }
+
+  body.printing-ai-brief .print-agenda-list {
+    margin: 0 !important;
+    padding-left: 14px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.25 !important;
+    color: #1e293b !important;
+  }
+
+  body.printing-ai-brief .print-agenda-list li {
+    margin-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-talking-points {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  body.printing-ai-brief .print-talking-points li {
+    font-size: 7.5pt !important;
+    line-height: 1.25 !important;
+    color: #1e293b !important;
+  }
+
+  body.printing-ai-brief .print-tag {
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    padding: 1px 3px !important;
+    border-radius: 2px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+  }
+
+  body.printing-ai-brief .print-tag.tag-fact {
+    background: #d1fae5 !important;
+    color: #065f46 !important;
+  }
+
+  body.printing-ai-brief .print-tag.tag-hyp {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+  }
+
+  body.printing-ai-brief .print-tag.tag-action {
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+  }
+
+  body.printing-ai-brief .print-action-item {
+    font-size: 7.5pt !important;
+    margin-bottom: 2px !important;
+    line-height: 1.25 !important;
+  }
+
+  body.printing-ai-brief .print-bullet-list {
+    margin: 0 !important;
+    padding-left: 12px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.25 !important;
+  }
+
+  body.printing-ai-brief .print-bullet-list li {
+    margin-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-disclaimer-note {
+    font-size: 6.5pt !important;
+    color: #64748b !important;
+    font-style: italic !important;
+    margin: 2px 0 0 !important;
+  }
+
+  body.printing-ai-brief .print-conflict-row {
+    font-size: 7pt !important;
+    color: #92400e !important;
+    background: #fffbeb !important;
+    border: 1px solid #fde68a !important;
+    border-radius: 3px !important;
+    padding: 2px 4px !important;
+    margin-bottom: 2px !important;
+  }
+
+  body.printing-ai-brief .print-evidence-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 3px !important;
+  }
+
+  body.printing-ai-brief .print-evidence-pill {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 7pt !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 3px !important;
+    padding: 1px 3px !important;
+  }
+
+  body.printing-ai-brief .print-ev-sys {
+    font-weight: 700 !important;
+    color: #1e3a8a !important;
+  }
+
+  body.printing-ai-brief .print-ev-id {
+    color: #475569 !important;
+  }
+
+  body.printing-ai-brief .print-ev-conf {
+    font-weight: 700 !important;
+    color: #059669 !important;
+  }
+
+  body.printing-ai-brief .print-footer {
+    border-top: 1px solid #cbd5e1 !important;
+    padding-top: 3px !important;
+    margin-top: 2px !important;
+    text-align: center !important;
+  }
+
+  body.printing-ai-brief .print-footer p {
+    font-size: 6.5pt !important;
+    color: #64748b !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* 2. Standard Screen View Print: body:not(.printing-ai-brief) */
+  body:not(.printing-ai-brief) {
+    background: #ffffff !important;
+  }
+
+  body:not(.printing-ai-brief) .left-rail,
+  body:not(.printing-ai-brief) .right-rail,
+  body:not(.printing-ai-brief) .detail-tabs,
+  body:not(.printing-ai-brief) .workspace-notice,
+  body:not(.printing-ai-brief) .header-controls,
+  body:not(.printing-ai-brief) .topbar,
+  body:not(.printing-ai-brief) .client-actions-row button,
+  body:not(.printing-ai-brief) .export-button,
+  body:not(.printing-ai-brief) .printable-brief-container {
+    display: none !important;
+  }
+
+  body:not(.printing-ai-brief) .app-shell {
     padding: 0 !important;
   }
-  .dashboard {
+
+  body:not(.printing-ai-brief) .dashboard {
     display: block !important;
+    padding: 0 !important;
   }
-  .main-column {
+
+  body:not(.printing-ai-brief) .main-column {
     max-width: 100% !important;
     width: 100% !important;
   }
-  .panel {
+
+  body:not(.printing-ai-brief) .panel {
     border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
     break-inside: avoid;
   }
-  .evidence-sources-list {
-    max-height: none;
-    overflow: visible;
-  }
-  .client-title {
+
+  body:not(.printing-ai-brief) .client-title {
     font-size: 22px;
   }
-  .cockpit-2x2-grid {
+
+  body:not(.printing-ai-brief) .cockpit-2x2-grid {
     grid-template-columns: 1fr 1fr;
   }
 }

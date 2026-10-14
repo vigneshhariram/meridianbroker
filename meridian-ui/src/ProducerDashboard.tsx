@@ -1,19 +1,17 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  AlertTriangle,
-  Calendar,
-  CheckCircle2,
-  CheckSquare,
   FileText,
-  MessageSquare,
-  RefreshCw,
+  Printer,
   Sparkles,
 } from 'lucide-react'
 import { generateBrief, getJson, type UserProfile } from './api'
-import type { Account, AccountBrief, AccountDetail, DetailTab, Signal } from './types'
+import type { Account, AccountBrief, AccountDetail, DetailTab } from './types'
 import { formatDate, formatMoney } from './format'
 import { AccountDetailsPanel } from './AccountDetailsPanel'
+import { ClientOverviewPanel } from './ClientOverviewPanel'
+import { AiBriefPanel } from './AiBriefPanel'
+import { PrintableOnePageBrief } from './PrintableOnePageBrief'
 import { Header } from './Header'
 
 export function ProducerDashboard({
@@ -21,16 +19,18 @@ export function ProducerDashboard({
   onSignOut,
   signingOut,
   initialAccountId = '',
+  initialTab = 'overview',
   onBack,
 }: {
   user: UserProfile
   onSignOut: () => void
   signingOut: boolean
   initialAccountId?: string
+  initialTab?: DetailTab
   onBack?: () => void
 }) {
   const [selectedId, setSelectedId] = useState(initialAccountId)
-  const [tab, setTab] = useState<DetailTab>('overview')
+  const [tab, setTab] = useState<DetailTab>(initialTab)
   const [search, setSearch] = useState('')
   const accountsQuery = useQuery({
     queryKey: ['accounts', user.userId],
@@ -48,7 +48,7 @@ export function ProducerDashboard({
     queryKey: ['details', user.userId, accountId, tab],
     queryFn: ({ signal }) =>
       getJson<AccountDetail[]>(`/accounts/${encodeURIComponent(accountId)}/${tab}`, signal),
-    enabled: !!accountId && tab !== 'overview',
+    enabled: !!accountId && tab !== 'overview' && tab !== 'ai-brief',
   })
   const brief = briefQuery.data
   const queryClient = useQueryClient()
@@ -73,6 +73,24 @@ export function ProducerDashboard({
     setTab('overview')
     setRegenerateError(null)
   }
+
+  function handleExportAiBrief() {
+    document.body.classList.add('printing-ai-brief')
+    const cleanup = () => {
+      document.body.classList.remove('printing-ai-brief')
+      window.removeEventListener('afterprint', cleanup)
+    }
+    window.addEventListener('afterprint', cleanup)
+    setTimeout(() => {
+      window.print()
+      setTimeout(cleanup, 2000)
+    }, 50)
+  }
+
+  function handlePrintView() {
+    document.body.classList.remove('printing-ai-brief')
+    window.print()
+  }
   const visibleAccounts = [...accounts]
     .filter((row) => row.name.toLowerCase().includes(search.toLowerCase()))
     .sort(
@@ -87,7 +105,8 @@ export function ProducerDashboard({
   const uniqueEvidence = [...new Map(evidence.map((item) => [item.evidence_id, item])).values()]
 
   return (
-    <div className="app-shell">
+    <>
+      <div className="app-shell">
       <Header
         user={user}
         subtitle="Client Growth and Retention Cockpit"
@@ -182,11 +201,20 @@ export function ProducerDashboard({
                       : `${brief.days_to_renewal} days`}
                   </span>
                   <button
-                    className="button button-outline export-button"
-                    onClick={() => window.print()}
+                    className="button button-primary export-button export-ai-brief-button"
+                    onClick={handleExportAiBrief}
+                    title="Export publication-ready 1-page executive brief PDF"
                   >
                     <FileText size={14} />
-                    Export brief
+                    Export AI Brief (PDF)
+                  </button>
+                  <button
+                    className="button button-outline print-view-button"
+                    onClick={handlePrintView}
+                    title="Print current tab view"
+                  >
+                    <Printer size={14} />
+                    Print View
                   </button>
                 </div>
               </section>
@@ -194,6 +222,7 @@ export function ProducerDashboard({
                 {(
                   [
                     ['overview', 'Overview'],
+                    ['ai-brief', 'AI Brief'],
                     ['policies', 'Policies'],
                     ['claims', 'Claims'],
                     ['billing', 'Billing'],
@@ -207,270 +236,29 @@ export function ProducerDashboard({
                     key={value}
                     onClick={() => setTab(value)}
                   >
+                    {value === 'ai-brief' && <Sparkles size={12} className="tab-sparkle-icon" />}
                     {label}
                   </button>
                 ))}
               </nav>
               {tab === 'overview' ? (
-                <>
-                  <section className="panel executive-summary-card">
-                    <div className="summary-title-row">
-                      <h2 className="panel-label">Executive summary</h2>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {brief.claim_review.omitted || !brief.claim_review.complete ? (
-                          <span className="completeness-badge alert" role="status">
-                            <AlertTriangle size={13} />
-                            {brief.claim_review.omitted
-                              ? `Completeness failed: ${brief.claim_review.omitted} omitted`
-                              : !brief.permissions?.claims
-                                ? 'Claim access restricted'
-                                : 'Completeness check failed'}
-                          </span>
-                        ) : (
-                          <span className="completeness-badge">
-                            <CheckCircle2 size={13} />
-                            {`${brief.claim_review.reviewed} of ${brief.claim_review.total} accessible open claims reviewed`}
-                          </span>
-                        )}
-                        <button
-                          className="regenerate-btn"
-                          onClick={() => generateMutation.mutate(accountId)}
-                          disabled={generateMutation.isPending}
-                          title="Regenerate brief using TCS GenAILab GPT-4o Model"
-                        >
-                          {generateMutation.isPending ? (
-                            <>
-                              <RefreshCw size={12} className="spin-icon" />
-                              Synthesizing...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles size={12} />
-                              Regenerate AI Brief
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    {regenerateError && (
-                      <div className="error-banner" role="alert" style={{ margin: '8px 0' }}>
-                        {regenerateError}
-                      </div>
-                    )}
-                    {(brief.claim_review.omitted || !brief.claim_review.complete) && (
-                      <div className="completeness-alert-box" role="alert">
-                        <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-                        <div>
-                          <strong>Scenario Alert: Material Record Omission Detected</strong>
-                          <p>
-                            {brief.claim_review.omitted
-                              ? `A material record (${brief.claim_review.omitted}) was omitted from the initial brief summary.`
-                              : 'Open claim records require synthesis.'}
-                            {' '}Click <strong>"Regenerate AI Brief"</strong> to synthesize full grounded context with the Client Intelligence Agent.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    <p className="summary-body">{brief.summary}</p>
-                    {brief.evidence_citations && brief.evidence_citations.length > 0 && (
-                      <div className="citations-row">
-                        <span className="citations-label">Citations:</span>
-                        <div className="citations-chips">
-                          {brief.evidence_citations.map((cite, idx) => (
-                            <span key={idx} className="citation-chip">
-                              {cite}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {brief.telemetry && (
-                      <div className="brief-telemetry-row">
-                        <span className="telemetry-badge">
-                          ⚡ {brief.telemetry.model} · {brief.telemetry.total_tokens.toLocaleString()} tokens · {(brief.telemetry.latency_ms / 1000).toFixed(1)}s · ${brief.telemetry.cost_usd.toFixed(4)}
-                        </span>
-                        <span className="telemetry-version">Version {brief.latest_brief?.version ?? 1}</span>
-                      </div>
-                    )}
-                    <p className="updated-label">
-                      Current source records · scenario date {formatDate(brief.as_of_date)}
-                    </p>
-                  </section>
-                  {((brief.agenda && brief.agenda.length > 0) || (brief.talking_points && brief.talking_points.length > 0)) && (
-                    <div className="meeting-prep-grid">
-                      {brief.agenda && brief.agenda.length > 0 && (
-                        <section className="panel agenda-panel">
-                          <div className="panel-header-row">
-                            <h2 className="card-subhead">
-                              <Calendar size={15} /> Stewardship Meeting Agenda
-                            </h2>
-                            <span className="card-badge">{brief.agenda.length} topics</span>
-                          </div>
-                          <ol className="agenda-numbered-list">
-                            {brief.agenda.map((item, idx) => (
-                              <li key={idx} className="agenda-item">
-                                <span>{item.replace(/^\d+\.\s*/, '')}</span>
-                              </li>
-                            ))}
-                          </ol>
-                        </section>
-                      )}
-                      {brief.talking_points && brief.talking_points.length > 0 && (
-                        <section className="panel talking-points-panel">
-                          <div className="panel-header-row">
-                            <h2 className="card-subhead">
-                              <MessageSquare size={15} />{' '}
-                              {user.role === 'Producer'
-                                ? 'Producer Talking Points'
-                                : 'Leadership Talking Points'}
-                            </h2>
-                            <span className="card-badge">Facts vs Hypotheses</span>
-                          </div>
-                          <ul className="talking-points-list">
-                            {brief.talking_points.map((tp, idx) => {
-                              const isHypothesis = tp.toLowerCase().includes('hypothesis')
-                              return (
-                                <li
-                                  key={idx}
-                                  className={`talking-point-item ${isHypothesis ? 'hypothesis-point' : 'fact-point'}`}
-                                >
-                                  <span className={`point-tag ${isHypothesis ? 'hypothesis-tag' : 'fact-tag'}`}>
-                                    {isHypothesis ? 'Hypothesis' : 'Fact'}
-                                  </span>
-                                  <span className="point-text">
-                                    {tp.replace(/^(Confirmed fact:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i, '')}
-                                  </span>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        </section>
-                      )}
-                    </div>
-                  )}
-                  {brief.suggested_actions && brief.suggested_actions.length > 0 && (
-                    <section className="panel suggested-actions-panel">
-                      <div className="panel-header-row">
-                        <h2 className="card-subhead">
-                          <CheckSquare size={15} /> Suggested Next Actions
-                        </h2>
-                        <span className="card-badge">{brief.suggested_actions.length} recommended</span>
-                      </div>
-                      <div className="actions-grid">
-                        {brief.suggested_actions.map((action, idx) => (
-                          <div key={idx} className="action-card">
-                            <div className="action-header">
-                              <span className={`action-type-tag ${action.action_type}`}>
-                                {action.action_type === 'draft_followup'
-                                  ? 'Follow-up'
-                                  : action.action_type === 'review_task'
-                                    ? 'Review'
-                                    : 'Referral'}
-                              </span>
-                              <span className="action-title">{action.title}</span>
-                            </div>
-                            <p className="action-description">{action.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                  <div className="cockpit-2x2-grid">
-                    <section className="cockpit-grid-card">
-                      <div className="card-subhead-row">
-                        <h2 className="card-subhead">Risk flags</h2>
-                        {brief.prioritized_risks && brief.prioritized_risks.length > 0 && (
-                          <span className="card-badge">{brief.prioritized_risks.length} AI prioritized</span>
-                        )}
-                      </div>
-                      {brief.prioritized_risks && brief.prioritized_risks.length > 0 && (
-                        <div className="ai-assessment-box">
-                          <span className="ai-box-label"><Sparkles size={11} /> AI Prioritized Risk Drivers</span>
-                          <ul className="ai-prioritized-list">
-                            {brief.prioritized_risks.map((risk, idx) => (
-                              <li key={idx} className="ai-prioritized-item">
-                                {risk}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <div className="card-list-items">
-                        {brief.risks.map((signal) => (
-                          <SignalRow signal={signal} key={signal.signal_id} />
-                        ))}
-                        {!brief.risks.length && <p className="muted">No supported risk flags.</p>}
-                      </div>
-                    </section>
-                    <section className="cockpit-grid-card">
-                      <div className="card-subhead-row">
-                        <h2 className="card-subhead">Opportunity signals (hypotheses)</h2>
-                        {brief.opportunity_hypotheses && brief.opportunity_hypotheses.length > 0 && (
-                          <span className="card-badge">{brief.opportunity_hypotheses.length} AI evaluated</span>
-                        )}
-                      </div>
-                      {brief.opportunity_hypotheses && brief.opportunity_hypotheses.length > 0 && (
-                        <div className="ai-assessment-box opportunity-hyp-box">
-                          <span className="ai-box-label"><Sparkles size={11} /> AI Opportunity Hypotheses Governance</span>
-                          <ul className="ai-hypotheses-list">
-                            {brief.opportunity_hypotheses.map((hyp, idx) => {
-                              const isHyp = hyp.toLowerCase().includes('hypothesis')
-                              return (
-                                <li key={idx} className={`ai-hypothesis-item ${isHyp ? 'is-hyp' : 'is-opp'}`}>
-                                  <span className={`opp-pill ${isHyp ? 'pill-hyp' : 'pill-opp'}`}>
-                                    {isHyp ? 'Hypothesis' : 'Opportunity'}
-                                  </span>
-                                  <span className="opp-text">{hyp}</span>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        </div>
-                      )}
-                      <div className="card-list-items">
-                        {brief.opportunities.map((signal) => (
-                          <SignalRow signal={signal} key={signal.signal_id} />
-                        ))}
-                        {!brief.opportunities.length && (
-                          <p className="muted">
-                            Insufficient accessible evidence for an opportunity.
-                          </p>
-                        )}
-                      </div>
-                      <p className="card-footer-muted">
-                        Validate assumptions with the client before recommending coverage.
-                      </p>
-                    </section>
-                    <section className="cockpit-grid-card">
-                      <h2 className="card-subhead">Open commitments</h2>
-                      <div className="card-list-items">
-                        {brief.commitments.map((item) => (
-                          <div className="commitment-line" key={item.commitment_id}>
-                            <span className="commit-title">{item.description}</span>
-                            <span
-                              className={item.status === 'overdue' ? 'overdue-tag' : 'date-tag'}
-                            >
-                              {item.status === 'overdue' && 'Overdue · '}
-                              {formatDate(item.due_date)}
-                            </span>
-                          </div>
-                        ))}
-                        {!brief.commitments.length && <p className="muted">No open commitments.</p>}
-                      </div>
-                    </section>
-                    {!!brief.milestones.length && (
-                      <section className="cockpit-grid-card">
-                        <h2 className="card-subhead">Renewal milestones</h2>
-                        {brief.milestones.map((item) => (
-                          <p className="milestone-line" key={item.milestone_id}>
-                            {item.milestone}
-                            <span>{formatDate(item.due_date)}</span>
-                          </p>
-                        ))}
-                      </section>
-                    )}
-                  </div>
-                </>
+                <ClientOverviewPanel
+                  brief={brief}
+                  userRole={user.role}
+                  onSelectTab={(newTab) => setTab(newTab)}
+                  onRegenerate={() => generateMutation.mutate(accountId)}
+                  regenerating={generateMutation.isPending}
+                  regenerateError={regenerateError}
+                />
+              ) : tab === 'ai-brief' ? (
+                <AiBriefPanel
+                  brief={brief}
+                  userRole={user.role}
+                  onRegenerate={() => generateMutation.mutate(accountId)}
+                  regenerating={generateMutation.isPending}
+                  regenerateError={regenerateError}
+                  onExportPdf={handleExportAiBrief}
+                />
               ) : (
                 <AccountDetailsPanel
                   accountName={brief.account.name}
@@ -527,39 +315,13 @@ export function ProducerDashboard({
         </aside>
       </div>
     </div>
-  )
-}
-
-function SignalRow({ signal }: { signal: Signal }) {
-  const conf = Number(signal.confidence || 0)
-  const isHypothesis = !signal.is_fact && conf < 0.6
-  const isOpportunity = !signal.is_fact && conf >= 0.6
-  return (
-    <div className="live-signal">
-      <div className="signal-item">
-        <span className="signal-item-text">{signal.title}</span>
-        <span
-          className={
-            signal.is_fact
-              ? `risk-chip ${signal.severity}`
-              : isHypothesis
-                ? 'confidence-chip hypothesis'
-                : 'confidence-chip opportunity-medium'
-          }
-        >
-          {isHypothesis && 'Hypothesis '}
-          {isOpportunity && 'Opportunity '}
-          {Math.round(conf * 100)}%
-        </span>
-      </div>
-      <p>{signal.description}</p>
-      {signal.assumptions && <small>Assumption: {signal.assumptions}</small>}
-      {signal.confidence_breakdown && (
-        <details className="signal-math-details">
-          <summary>Confidence breakdown</summary>
-          <pre>{JSON.stringify(signal.confidence_breakdown, null, 2)}</pre>
-        </details>
-      )}
-    </div>
+    {brief && (
+      <PrintableOnePageBrief
+        brief={brief}
+        evidence={uniqueEvidence}
+        userRole={user.role}
+      />
+    )}
+  </>
   )
 }

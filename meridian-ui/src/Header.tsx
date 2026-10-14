@@ -21,7 +21,12 @@ export function Header({
       </div>
       <div className="header-controls">
         {onBack && (
-          <button type="button" className="header-back" onClick={onBack}>
+          <button
+            type="button"
+            className="header-back"
+            aria-label="Back to regional portfolio"
+            onClick={onBack}
+          >
             ← Regional portfolio
           </button>
         )}

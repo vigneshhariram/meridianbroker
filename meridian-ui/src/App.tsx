@@ -98,6 +98,9 @@ export default function App() {
           onSignOut={signOut}
           signingOut={signingOut}
           initialAccountId={openedAccount}
+          initialTab={
+            session.user.role === 'Regional Leader' && openedAccount ? 'ai-brief' : 'overview'
+          }
           onBack={session.user.role === 'Regional Leader' ? () => setOpenedAccount('') : undefined}
         />
       )}

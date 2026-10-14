@@ -1924,6 +1924,11 @@
 /* ========================================================== */
 
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 8mm;
+  }
+
   /* 1. Dedicated AI Brief PDF Print: body.printing-ai-brief */
   body.printing-ai-brief {
     margin: 0 !important;
@@ -1950,7 +1955,8 @@
     position: static !important;
     width: 100% !important;
     height: 100% !important;
-    max-height: 270mm !important;
+    max-height: 260mm !important;
+    overflow: hidden !important;
     box-sizing: border-box !important;
     page-break-inside: avoid !important;
     page-break-after: avoid !important;
@@ -2266,6 +2272,10 @@
   body:not(.printing-ai-brief) .topbar,
   body:not(.printing-ai-brief) .client-actions-row button,
   body:not(.printing-ai-brief) .export-button,
+  body:not(.printing-ai-brief) .card-quick-action,
+  body:not(.printing-ai-brief) .ai-jump-btn,
+  body:not(.printing-ai-brief) .regenerate-btn,
+  body:not(.printing-ai-brief) .export-brief-inline-btn,
   body:not(.printing-ai-brief) .printable-brief-container {
     display: none !important;
   }

@@ -33,6 +33,7 @@ function formatEventType(type: string): string {
 
 export function ClientOverviewPanel({
   brief,
+  userRole = 'Producer',
   onSelectTab,
   onRegenerate,
   regenerating,
@@ -117,7 +118,7 @@ export function ClientOverviewPanel({
         <div className="ai-callout-header">
           <div className="ai-callout-left">
             <span className="ai-brief-pill">
-              <Sparkles size={13} /> AI Meeting Brief v{brief.latest_brief?.version ?? 1}
+              <Sparkles size={13} /> {userRole === 'Producer' ? 'Producer' : 'Leadership'} AI Brief v{brief.latest_brief?.version ?? 1}
             </span>
             {brief.claim_review.omitted || !brief.claim_review.complete ? (
               <span className="ai-callout-status">

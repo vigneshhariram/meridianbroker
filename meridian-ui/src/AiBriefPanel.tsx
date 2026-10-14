@@ -206,7 +206,7 @@ export function AiBriefPanel({
                       </span>
                       <span className="point-text">
                         {tp.replace(
-                          /^(Confirmed fact:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
+                          /^(Confirmed fact:\s*|Fact:\s*|Portfolio status:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
                           ''
                         )}
                       </span>

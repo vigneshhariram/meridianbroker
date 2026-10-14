@@ -10,7 +10,7 @@ export function PrintableOnePageBrief({
   evidence: Evidence[]
   userRole?: string
 }) {
-  const isComplete = !brief.claim_review.omitted && brief.claim_review.complete
+  const isComplete = !brief.claim_review?.omitted && !!brief.claim_review?.complete
   const telemetry = brief.telemetry
 
   return (
@@ -127,7 +127,7 @@ export function PrintableOnePageBrief({
                         </span>{' '}
                         <span>
                           {tp.replace(
-                            /^(Confirmed fact:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
+                            /^(Confirmed fact:\s*|Fact:\s*|Portfolio status:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
                             ''
                           )}
                         </span>
@@ -214,17 +214,21 @@ export function PrintableOnePageBrief({
             {/* Grounded Evidence Records */}
             <section className="print-section">
               <h2 className="print-section-title">Grounded Evidence Audit ({evidence.length} records)</h2>
-              <div className="print-evidence-grid">
-                {evidence.slice(0, 4).map((item) => (
-                  <div key={item.evidence_id} className="print-evidence-pill">
-                    <span className="print-ev-sys">{item.source_system}</span>
-                    <span className="print-ev-id">{item.source_id}</span>
-                    <span className="print-ev-conf">
-                      {Math.round(Number(item.confidence) * 100)}%
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {evidence.length > 0 ? (
+                <div className="print-evidence-grid">
+                  {evidence.slice(0, 4).map((item) => (
+                    <div key={item.evidence_id} className="print-evidence-pill">
+                      <span className="print-ev-sys">{item.source_system}</span>
+                      <span className="print-ev-id">{item.source_id}</span>
+                      <span className="print-ev-conf">
+                        {Math.round(Number(item.confidence) * 100)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="print-muted">No supported evidence records.</p>
+              )}
             </section>
           </div>
         </div>

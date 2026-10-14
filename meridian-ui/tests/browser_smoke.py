@@ -105,6 +105,26 @@ def run(url: str, screenshot: str | None):
         expect(page.locator(".timeline-card-panel")).to_be_visible()
         expect(page.locator(".agenda-panel")).not_to_be_visible()
 
+        # Operational quick-action shortcut to AI Brief
+        page.get_by_role("button", name="Open AI Meeting Brief →").click()
+        expect(page.locator(".agenda-panel")).to_be_visible()
+        expect(page.locator(".timeline-card-panel")).not_to_be_visible()
+
+        # Operational quick-action shortcut to Policies
+        page.get_by_role("button", name="Overview", exact=True).click()
+        page.get_by_role("button", name="View policies →").click()
+        expect(page.locator(".details-panel")).to_be_visible()
+        expect(page.locator(".details-panel")).to_contain_text("Policies")
+
+        # Verify publication-ready 1-page PDF export strictly produces 1 physical page
+        page.evaluate("document.body.classList.add('printing-ai-brief')")
+        page.emulate_media(media="print")
+        import io, pypdf
+        pdf_data = page.pdf(format="Letter")
+        assert len(pypdf.PdfReader(io.BytesIO(pdf_data)).pages) == 1, "Printable AI Brief exceeded 1 physical page"
+        page.evaluate("document.body.classList.remove('printing-ai-brief')")
+        page.emulate_media(media="screen")
+
         # RBAC checks
         assert page.request.get(url + "/accounts/A05/documents").status == 403
         assert page.request.get(url + "/accounts/A05/brief?user_id=U2").status == 403

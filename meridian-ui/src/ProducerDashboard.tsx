@@ -80,10 +80,9 @@ export function ProducerDashboard({
       document.body.classList.remove('printing-ai-brief')
       window.removeEventListener('afterprint', cleanup)
     }
-    window.addEventListener('afterprint', cleanup)
+    window.addEventListener('afterprint', cleanup, { once: true })
     setTimeout(() => {
       window.print()
-      setTimeout(cleanup, 2000)
     }, 50)
   }
 

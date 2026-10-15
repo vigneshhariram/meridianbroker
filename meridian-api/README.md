@@ -1,5 +1,16 @@
 # meridianbroker
 
+The latest [AI integration report](../docs/hub-refresh-and-ai.md) documents automatic client
+preparation, persisted background jobs, source/permission-aware cache isolation, bounded provider
+calls and verified fallback behavior. Database resets are opt-in (`RESET_DB_ON_START=1`);
+normal startup preserves existing business records and real provider audit history.
+Every backend start or reload clears generated briefs and generation jobs; brief
+versions restart at 1. AI output is reused only within that backend session.
+Source seed scripts contain no generated briefs or fabricated generation audit
+entries. Historical scenario examples are isolated in `sql/fixtures/` and are
+never loaded automatically. Existing databases receive the same generated-state
+cleanup on their next startup, including removal of known legacy fixture audit IDs.
+
 ## Accounts API
 
 This backend service runs on FastAPI and uses Python's built-in `sqlite3` database engine, managed with **`uv`**.

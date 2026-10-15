@@ -183,6 +183,16 @@ class BriefTelemetryModel(BaseModel):
     total_tokens: int
     latency_ms: int
     cost_usd: float
+    fallback_reason: str | None = None
+
+
+class BriefGenerationState(BaseModel):
+    mode: Literal["live_ai", "stored_ai", "rules", "offline"]
+    stale: bool
+    reason: str | None = None
+    can_generate: bool = True
+    source_fingerprint: str
+    generated_at: datetime | None = None
 
 
 class LatestBrief(BaseModel):
@@ -219,3 +229,21 @@ class AccountBrief(BaseModel):
     claim_review: dict[str, Any] = Field(default_factory=dict)
     timeline: list[dict[str, Any]] = Field(default_factory=list)
     permissions: dict[str, bool] = Field(default_factory=dict)
+    generation: BriefGenerationState
+
+
+class BriefGenerationRequest(BaseModel):
+    force: bool = False
+
+
+class BriefGenerationJob(BaseModel):
+    job_id: str
+    account_id: str
+    source_fingerprint: str
+    status: Literal["queued", "running", "succeeded", "failed"]
+    phase: Literal["queued", "collecting", "generating", "validating", "completed", "failed"]
+    message: str
+    error: str | None = None
+    created_at: datetime
+    updated_at: datetime
+    result: AccountBrief | None = None

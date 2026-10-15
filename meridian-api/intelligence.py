@@ -15,6 +15,7 @@ from agent import (
     RiskSignalContext,
 )
 from auth import SessionUser
+from retrieval import retrieve_snapshot
 
 SOURCE_KEYS = {
     "claims": "claim_id",
@@ -593,7 +594,7 @@ def build_brief(
             f"Confirmed discrepancy: {c['field']} differs between {c['source_a']} ({c['value_a']}) and {c['source_b']} ({c['value_b']}); resolve prior to binding."
         )
     for opp in opportunities:
-        conf_pct = int(float(opp.get("confidence") or 0.5) * 100)
+        conf_pct = int(float(opp["confidence"] if opp.get("confidence") is not None else 0.5) * 100)
         default_talking_points.append(
             f"Hypothesis (unverified): {opp['title']} ({conf_pct}% confidence) based on account activity; validate need before coverage modeling."
         )
@@ -614,8 +615,8 @@ def build_brief(
         default_suggested_actions.append(
             {
                 "action_type": "review_task",
-                "title": f"Litigation & reserve check for {open_claims[0]['claim_number']}",
-                "description": "Contact claims adjuster for litigation evaluation and updated reserve posture.",
+                "title": f"Claim status & reserve review for {open_claims[0]['claim_number']}",
+                "description": "Confirm the current claim status and recorded reserve with the claims adjuster.",
             }
         )
 
@@ -628,7 +629,7 @@ def build_brief(
         or ["No material operational risk flags identified."]
     )
     opportunity_hypotheses = latest_content.get("opportunity_hypotheses") or [
-        f"Hypothesis (unverified): {o['title']} ({int(float(o.get('confidence') or 0.5) * 100)}% confidence) - {o.get('description', '')}"
+        f"Hypothesis (unverified): {o['title']} ({int(float(o['confidence'] if o.get('confidence') is not None else 0.5) * 100)}% confidence) - {o.get('description', '')}"
         for o in opportunities
     ]
     suggested_actions = latest_content.get("suggested_actions") or default_suggested_actions
@@ -766,6 +767,7 @@ def build_agent_input_context(
     policy_contexts = [
         PolicyContext(
             policy_id=row["policy_id"],
+            policy_number=row.get("policy_number"),
             line_of_business=row.get("line_of_business") or "Commercial",
             carrier=row.get("carrier") or "Carrier",
             premium=float(row.get("premium") or 0.0),
@@ -802,7 +804,7 @@ def build_agent_input_context(
             title=r["title"],
             description=r["description"],
             severity=r.get("severity") or "medium",
-            confidence=float(r.get("confidence") or 0.7),
+            confidence=float(r["confidence"]) if r.get("confidence") is not None else 0.7,
             evidence_snippets=[
                 ev.get("snippet", "") for ev in r.get("evidence", []) if ev.get("snippet")
             ],
@@ -816,7 +818,7 @@ def build_agent_input_context(
             category=o.get("category") or "coverage",
             title=o["title"],
             description=o["description"],
-            confidence=float(o.get("confidence") or 0.5),
+            confidence=float(o["confidence"]) if o.get("confidence") is not None else 0.5,
             assumptions=o.get("assumptions"),
         )
         for o in brief_data["opportunities"]
@@ -868,13 +870,19 @@ def build_agent_input_context(
         opportunities=opp_contexts,
         contradictions=contra_contexts,
         restricted_resources=[res for res, allowed in permissions.items() if not allowed],
+        retrieval=retrieve_snapshot(
+            account_id,
+            "meeting preparation documents activities notes exposure changes renewal commitments",
+            as_of.isoformat(),
+            data,
+        ),
         allowed_citation_ids=sorted(
             {str(row[SOURCE_KEYS[table]]) for table, rows in data.items() for row in rows}
             | {
                 row[field]
                 for rows in data.values()
                 for row in rows
-                for field in ("claim_number", "case_number")
+                for field in ("claim_number", "case_number", "policy_number")
                 if row.get(field)
             }
             | {

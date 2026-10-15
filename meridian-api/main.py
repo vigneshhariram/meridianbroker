@@ -9,9 +9,10 @@ from typing import Literal
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from access import allowed_accounts, authorize, log_security, verify_identity
+from access import allowed_accounts, authorize, log_security, require_leader, verify_identity
 from agent import ClientIntelligenceAgent
 from auth import AuthService, SessionUser, initialize_security
+from executive_dashboard import ExecutiveDashboard, build_executive_dashboard
 from generation import (
     generate_account,
     get_job,
@@ -34,6 +35,18 @@ from models import (
     ServiceCase,
 )
 from portfolio import build_portfolio
+from workflows import (
+    ActionRequest,
+    ApprovalRequest,
+    CopilotRequest,
+    CopilotResponse,
+    FeedbackRequest,
+    answer_question,
+    create_action,
+    decide_action,
+    list_actions,
+    save_feedback,
+)
 
 logger = logging.getLogger(__name__)
 BASE_DIR = Path(__file__).resolve().parent
@@ -56,7 +69,9 @@ async def lifespan(app: FastAPI):
     with closing(_get_database_connection()) as connection:
         initialize_generation(connection)
         reset_generated_state(connection)
-        logger.info("Started fresh briefing session; source records and real audit history preserved.")
+        logger.info(
+            "Started fresh briefing session; source records and real audit history preserved."
+        )
     try:
         yield
     finally:
@@ -199,6 +214,62 @@ def get_brief_generation(
     account_id: str, job_id: str, user: SessionUser = Depends(auth.require_user)
 ):
     return get_job(_get_database_connection, user, account_id, job_id, AS_OF_DATE)
+
+
+@app.post("/accounts/{account_id}/copilot", response_model=CopilotResponse)
+def ask_copilot(
+    account_id: str,
+    payload: CopilotRequest,
+    user: SessionUser = Depends(auth.require_user),
+):
+    with closing(_get_database_connection()) as connection:
+        return answer_question(connection, user, account_id, payload.question, AS_OF_DATE)
+
+
+@app.get("/accounts/{account_id}/actions")
+def get_actions(account_id: str, user: SessionUser = Depends(auth.require_user)):
+    with closing(_get_database_connection()) as connection:
+        return list_actions(connection, user, account_id)
+
+
+@app.post("/accounts/{account_id}/actions", status_code=201)
+def submit_action(
+    account_id: str,
+    payload: ActionRequest,
+    user: SessionUser = Depends(auth.require_user),
+):
+    with closing(_get_database_connection()) as connection:
+        return create_action(connection, user, account_id, payload, AS_OF_DATE)
+
+
+@app.post("/accounts/{account_id}/actions/{action_id}/approve")
+def review_action(
+    account_id: str,
+    action_id: str,
+    payload: ApprovalRequest,
+    user: SessionUser = Depends(auth.require_user),
+):
+    with closing(_get_database_connection()) as connection:
+        return decide_action(connection, user, account_id, action_id, payload.approved, AS_OF_DATE)
+
+
+@app.post("/accounts/{account_id}/feedback", status_code=201)
+def submit_feedback(
+    account_id: str,
+    payload: FeedbackRequest,
+    user: SessionUser = Depends(auth.require_user),
+):
+    with closing(_get_database_connection()) as connection:
+        return save_feedback(connection, user, account_id, payload, AS_OF_DATE)
+
+
+@app.get("/api/executive-dashboard", response_model=ExecutiveDashboard)
+def get_executive_dashboard(user: SessionUser = Depends(auth.require_user)):
+    require_leader(user)
+    with closing(_get_database_connection()) as connection:
+        result = build_executive_dashboard(connection, user, AS_OF_DATE)
+        log_security(connection, user, "executive_dashboard_read", detail=user.region)
+        return result
 
 
 @app.get("/portfolio")

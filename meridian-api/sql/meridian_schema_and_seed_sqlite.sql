@@ -478,3 +478,42 @@ INSERT INTO access_rules (user_id, account_id, allowed, can_view_policies, can_v
 
 
 
+
+
+-- Additive executive financial demo facts (existing identities only).
+
+CREATE TABLE IF NOT EXISTS policy_financial_months (
+    policy_id TEXT NOT NULL REFERENCES policies(policy_id),
+    posted_at DATE NOT NULL,
+    earned_premium NUMERIC(14,2) NOT NULL CHECK (earned_premium >= 0),
+    commission_revenue NUMERIC(14,2) NOT NULL CHECK (commission_revenue >= 0),
+    paid_losses NUMERIC(14,2) NOT NULL CHECK (paid_losses >= 0),
+    source TEXT NOT NULL DEFAULT 'synthetic_financial_seed_v1',
+    PRIMARY KEY (policy_id, posted_at)
+);
+CREATE TABLE IF NOT EXISTS renewal_outcomes (
+    account_id TEXT NOT NULL REFERENCES accounts(account_id),
+    renewed_at DATE NOT NULL,
+    retained INTEGER NOT NULL CHECK (retained IN (0,1)),
+    source TEXT NOT NULL DEFAULT 'synthetic_financial_seed_v1',
+    PRIMARY KEY (account_id, renewed_at)
+);
+
+WITH months(posted_at) AS (VALUES ('2025-11-01'),('2025-12-01'),('2026-01-01'),('2026-02-01'),('2026-03-01'),('2026-04-01'),('2026-05-01'),('2026-06-01'),('2026-07-01'),('2026-08-01'),('2026-09-01'),('2026-10-01'))
+INSERT INTO policy_financial_months
+    (policy_id,posted_at,earned_premium,commission_revenue,paid_losses)
+SELECT p.policy_id,m.posted_at,ROUND(p.premium/12.0,2),
+       ROUND(p.premium*0.12/12.0,2),ROUND(p.premium*0.35/12.0,2)
+FROM policies p CROSS JOIN months m
+WHERE p.policy_id IN ('P01','P02','P03','P04','P05','P06','P07','P08','P09','P10','P11','P12','P13','P14','P15','P16','P17','P18')
+  AND p.account_id IN ('A01','A02','A03','A04','A05','A06','A07','A08','A09','A10')
+  AND m.posted_at >= p.effective_date
+  AND m.posted_at <= '2026-10-08'
+  AND p.premium IS NOT NULL AND p.premium >= 0
+ON CONFLICT (policy_id,posted_at) DO NOTHING;
+INSERT INTO renewal_outcomes (account_id,renewed_at,retained)
+SELECT p.account_id,MAX(date(p.renewal_date,'-1 year')),1 FROM policies p
+WHERE p.policy_id IN ('P01','P02','P03','P04','P05','P06','P07','P08','P09','P10','P11','P12','P13','P14','P15','P16','P17','P18')
+  AND date(p.renewal_date,'-1 year') <= '2026-10-08'
+GROUP BY p.account_id
+ON CONFLICT (account_id,renewed_at) DO NOTHING;

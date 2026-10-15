@@ -51,6 +51,8 @@ dist-ssr/
 *.env
 *.env.*
 *.env.example
+!.env.example
+!**/.env.example
 
 # OS generated files
 .DS_Store

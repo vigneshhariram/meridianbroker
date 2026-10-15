@@ -184,6 +184,8 @@ class BriefTelemetryModel(BaseModel):
     latency_ms: int
     cost_usd: float
     fallback_reason: str | None = None
+    cost_known: bool = True
+    cost_basis: str = "public_list_estimate"
 
 
 class BriefGenerationState(BaseModel):

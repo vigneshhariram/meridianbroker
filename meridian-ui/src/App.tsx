@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { getJson, postJson, setSession, type Session } from './api'
-import { SignIn } from './SignIn'
-import { ProducerDashboard } from './ProducerDashboard'
-import { RegionalDashboard } from './RegionalDashboard'
+import { ErrorState, LoadingState } from './components/ui'
 import './App.css'
+
+const SignIn = lazy(() => import('./SignIn').then((module) => ({ default: module.SignIn })))
+const ProducerDashboard = lazy(() =>
+  import('./ProducerDashboard').then((module) => ({ default: module.ProducerDashboard }))
+)
+const RegionalDashboard = lazy(() =>
+  import('./RegionalDashboard').then((module) => ({ default: module.RegionalDashboard }))
+)
 
 export default function App() {
   const client = useQueryClient()
@@ -71,19 +77,14 @@ export default function App() {
 
   if (session === undefined)
     return (
-      <div className="session-loading" role="status">
-        <span className="loader" />
-        Restoring your workspace…
-      </div>
+      <main className="session-loading">
+        <LoadingState label="Restoring your workspace…" />
+      </main>
     )
   if (!session) return <SignIn onSignIn={signIn} notice={notice} />
   return (
     <>
-      {notice && (
-        <div className="error-banner" role="alert">
-          {notice}
-        </div>
-      )}
+      {notice && <ErrorState message={notice} />}
       {session.user.role === 'Regional Leader' && !openedAccount ? (
         <RegionalDashboard
           user={session.user}

@@ -1,318 +1,324 @@
-import {
-  AlertTriangle,
-  Calendar,
-  CheckCircle2,
-  CheckSquare,
-  FileText,
-  MessageSquare,
-  RefreshCw,
-  Sparkles,
-} from 'lucide-react'
-import type { AccountBrief, Signal } from './types'
+import { useState } from 'react'
+import { Calendar, CheckSquare, FileText, MessageSquare, Sparkles } from 'lucide-react'
+import type { AccountBrief, Signal, SuggestedAction } from './types'
+import type { GenerationController } from './useBriefGeneration'
 import { formatDate } from './format'
+import { BriefStatus } from './BriefStatus'
+import { BriefActionDraft } from './BriefActionDraft'
+import { CitationSheet } from './CitationSheet'
+import { Accordion, Badge, Button, Card, EmptyState, Skeleton, StatusBadge } from './components/ui'
+import { RecordSheet, type InspectionRecord } from './components/RecordSheet'
 
 export function SignalRow({ signal }: { signal: Signal }) {
-  const conf = Number(signal.confidence || 0)
-  const isHypothesis = !signal.is_fact && conf < 0.6
-  const isOpportunity = !signal.is_fact && conf >= 0.6
+  const [inspection, setInspection] = useState<InspectionRecord | null>(null)
   return (
-    <div className="live-signal">
+    <article className="live-signal">
       <div className="signal-item">
-        <span className="signal-item-text">{signal.title}</span>
-        <span
-          className={
-            signal.is_fact
-              ? `risk-chip ${signal.severity}`
-              : isHypothesis
-                ? 'confidence-chip hypothesis'
-                : 'confidence-chip opportunity-medium'
-          }
-        >
-          {isHypothesis && 'Hypothesis '}
-          {isOpportunity && 'Opportunity '}
-          {Math.round(conf * 100)}%
-        </span>
+        <strong>{signal.title ?? 'Untitled signal'}</strong>
+        <Badge tone={signal.is_fact ? 'info' : 'warning'}>
+          {signal.is_fact ? 'Fact' : 'Hypothesis'} ·{' '}
+          {signal.confidence == null
+            ? 'Confidence not recorded'
+            : `${Math.round(Number(signal.confidence) * 100)}%`}
+        </Badge>
       </div>
-      <p>{signal.description}</p>
+      <div className="inline-controls mt-2">
+        <StatusBadge status={signal.severity} />
+        {signal.rule_id && <Badge>{signal.rule_id}</Badge>}
+      </div>
+      {signal.description && <p>{signal.description}</p>}
       {signal.assumptions && <small>Assumption: {signal.assumptions}</small>}
-      {signal.confidence_breakdown && (
-        <details className="signal-math-details">
-          <summary>Confidence breakdown</summary>
-          <pre>{JSON.stringify(signal.confidence_breakdown, null, 2)}</pre>
-        </details>
-      )}
-    </div>
+      <Accordion
+        sections={[
+          {
+            id: `${signal.signal_id}:evidence`,
+            title: `Evidence & confidence · ${signal.evidence.length} source records`,
+            content: (
+              <div className="evidence-list">
+                {signal.confidence_breakdown && (
+                  <dl className="record-fields">
+                    {Object.entries(signal.confidence_breakdown).map(([key, value]) => (
+                      <div key={key}>
+                        <dt>{key.replaceAll('_', ' ')}</dt>
+                        <dd>
+                          {typeof value === 'boolean'
+                            ? value
+                              ? 'Yes'
+                              : 'No'
+                            : typeof value === 'object'
+                              ? JSON.stringify(value)
+                              : String(value)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                {signal.evidence.map((item) => (
+                  <div className="evidence-entry" key={item.evidence_id}>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        setInspection({
+                          id: item.evidence_id,
+                          title: item.source_id ?? item.evidence_id,
+                          description:
+                            'Evidence provenance and confidence inputs returned for this signal.',
+                          content: item.snippet,
+                          fields: [
+                            { label: 'Source system', value: item.source_system },
+                            {
+                              label: 'Record type',
+                              value: item.source_table?.replaceAll('_', ' '),
+                            },
+                            { label: 'Source ID', value: item.source_id },
+                            { label: 'Recency date', value: formatDate(item.recency_date) },
+                            {
+                              label: 'Confidence',
+                              value:
+                                item.confidence == null
+                                  ? 'Not recorded'
+                                  : `${Math.round(Number(item.confidence) * 100)}%`,
+                            },
+                            {
+                              label: 'Source reliability',
+                              value:
+                                item.source_score == null
+                                  ? 'Not recorded'
+                                  : `${Math.round(Number(item.source_score) * 100)}%`,
+                            },
+                            {
+                              label: 'Recency factor',
+                              value:
+                                item.recency_factor == null
+                                  ? 'Not recorded'
+                                  : Number(item.recency_factor).toFixed(2),
+                            },
+                            { label: 'Evidence ID', value: item.evidence_id },
+                          ],
+                        })
+                      }
+                    >
+                      {item.source_system} · {item.source_id}
+                    </Button>
+                    <p>{item.snippet}</p>
+                    <small>{formatDate(item.recency_date)}</small>
+                  </div>
+                ))}
+                {!signal.evidence.length && (
+                  <p className="muted">No accessible supporting records.</p>
+                )}
+              </div>
+            ),
+          },
+        ]}
+      />
+      <RecordSheet record={inspection} onClose={() => setInspection(null)} />
+    </article>
   )
 }
 
 export function AiBriefPanel({
   brief,
   userRole = 'Producer',
-  onRegenerate,
-  regenerating,
-  regenerateError,
+  generation,
   onExportPdf,
 }: {
   brief: AccountBrief
   userRole?: string
-  onRegenerate: () => void
-  regenerating: boolean
-  regenerateError?: string | null
+  generation: GenerationController
   onExportPdf: () => void
 }) {
+  const [citation, setCitation] = useState<string | null>(null)
+  const [selectedAction, setSelectedAction] = useState<SuggestedAction | null>(null)
   return (
     <div className="ai-brief-panel">
-      {/* 1. Synthesis & Telemetry Header */}
-      <section className="panel executive-summary-card">
+      <Card className="executive-summary-card" aria-labelledby="summary-title">
         <div className="summary-title-row">
-          <h2 className="panel-label">Executive summary & agent synthesis</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {brief.claim_review.omitted || !brief.claim_review.complete ? (
-              <span className="completeness-badge alert" role="status">
-                <AlertTriangle size={13} />
-                {brief.claim_review.omitted
-                  ? `Completeness failed: ${brief.claim_review.omitted} omitted`
-                  : !brief.permissions?.claims
-                    ? 'Claim access restricted'
-                    : 'Completeness check failed'}
-              </span>
-            ) : (
-              <span className="completeness-badge">
-                <CheckCircle2 size={13} />
-                {`${brief.claim_review.reviewed} of ${brief.claim_review.total} accessible open claims reviewed`}
-              </span>
-            )}
-            <button
-              className="regenerate-btn"
-              onClick={onRegenerate}
-              disabled={regenerating}
-              title="Regenerate brief using TCS GenAILab GPT-4o Model"
-            >
-              {regenerating ? (
-                <>
-                  <RefreshCw size={12} className="spin-icon" />
-                  Synthesizing...
-                </>
-              ) : (
-                <>
-                  <Sparkles size={12} />
-                  Regenerate AI Brief
-                </>
-              )}
-            </button>
-            <button
-              className="button button-outline export-brief-inline-btn"
-              onClick={onExportPdf}
-              title="Export 1-page publication-ready executive briefing PDF"
-            >
-              <FileText size={12} />
-              Export Brief (PDF)
-            </button>
-          </div>
-        </div>
-
-        {regenerateError && (
-          <div className="error-banner" role="alert" style={{ margin: '8px 0' }}>
-            {regenerateError}
-          </div>
-        )}
-
-        {(brief.claim_review.omitted || !brief.claim_review.complete) && (
-          <div className="completeness-alert-box" role="alert">
-            <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <strong>Scenario Alert: Material Record Omission Detected</strong>
-              <p>
-                {brief.claim_review.omitted
-                  ? `A material record (${brief.claim_review.omitted}) was omitted from the initial brief summary.`
-                  : 'Open claim records require synthesis.'}{' '}
-                Click <strong>"Regenerate AI Brief"</strong> to synthesize full grounded context
-                with the Client Intelligence Agent.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <p className="summary-body">{brief.summary}</p>
-
-        {brief.evidence_citations && brief.evidence_citations.length > 0 && (
-          <div className="citations-row">
-            <span className="citations-label">Grounded Citations:</span>
-            <div className="citations-chips">
-              {brief.evidence_citations.map((cite, idx) => (
-                <span key={idx} className="citation-chip">
-                  {cite}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {brief.telemetry && (
-          <div className="brief-telemetry-row">
-            <span className="telemetry-badge">
-              ⚡ {brief.telemetry.model} · {brief.telemetry.total_tokens.toLocaleString()} tokens ·{' '}
-              {(brief.telemetry.latency_ms / 1000).toFixed(1)}s · ${brief.telemetry.cost_usd.toFixed(4)}
-            </span>
-            <span className="telemetry-version">Version {brief.latest_brief?.version ?? 1}</span>
-          </div>
-        )}
-        <p className="updated-label">
-          Current source records · scenario date {formatDate(brief.as_of_date)}
-        </p>
-      </section>
-
-      {/* 2. Stewardship Meeting Preparation Grid */}
-      {((brief.agenda && brief.agenda.length > 0) ||
-        (brief.talking_points && brief.talking_points.length > 0)) && (
-        <div className="meeting-prep-grid">
-          {brief.agenda && brief.agenda.length > 0 && (
-            <section className="panel agenda-panel">
-              <div className="panel-header-row">
-                <h2 className="card-subhead">
-                  <Calendar size={15} /> Stewardship Meeting Agenda
-                </h2>
-                <span className="card-badge">{brief.agenda.length} topics</span>
-              </div>
-              <ol className="agenda-numbered-list">
-                {brief.agenda.map((item, idx) => (
-                  <li key={idx} className="agenda-item">
-                    <span>{item.replace(/^\d+\.\s*/, '')}</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          {brief.talking_points && brief.talking_points.length > 0 && (
-            <section className="panel talking-points-panel">
-              <div className="panel-header-row">
-                <h2 className="card-subhead">
-                  <MessageSquare size={15} />{' '}
-                  {userRole === 'Producer' ? 'Producer Talking Points' : 'Leadership Talking Points'}
-                </h2>
-                <span className="card-badge">Facts vs Hypotheses</span>
-              </div>
-              <ul className="talking-points-list">
-                {brief.talking_points.map((tp, idx) => {
-                  const isHypothesis = tp.toLowerCase().includes('hypothesis')
-                  return (
-                    <li
-                      key={idx}
-                      className={`talking-point-item ${isHypothesis ? 'hypothesis-point' : 'fact-point'}`}
-                    >
-                      <span className={`point-tag ${isHypothesis ? 'hypothesis-tag' : 'fact-tag'}`}>
-                        {isHypothesis ? 'Hypothesis' : 'Fact'}
-                      </span>
-                      <span className="point-text">
-                        {tp.replace(
-                          /^(Confirmed fact:\s*|Fact:\s*|Portfolio status:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
-                          ''
-                        )}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-          )}
-        </div>
-      )}
-
-      {/* 3. Suggested Next Actions */}
-      {brief.suggested_actions && brief.suggested_actions.length > 0 && (
-        <section className="panel suggested-actions-panel">
-          <div className="panel-header-row">
-            <h2 className="card-subhead">
-              <CheckSquare size={15} /> Suggested Next Actions
+          <div>
+            <p className="eyebrow">
+              {userRole === 'Producer' ? 'Producer' : 'Leadership'} preparation
+            </p>
+            <h2 className="panel-label" id="summary-title">
+              <Sparkles size={20} />
+              Executive brief
             </h2>
-            <span className="card-badge">{brief.suggested_actions.length} recommended</span>
           </div>
-          <div className="actions-grid">
-            {brief.suggested_actions.map((action, idx) => (
-              <div key={idx} className="action-card">
-                <div className="action-header">
-                  <span className={`action-type-tag ${action.action_type}`}>
-                    {action.action_type === 'draft_followup'
-                      ? 'Follow-up'
-                      : action.action_type === 'review_task'
-                        ? 'Review'
-                        : 'Referral'}
-                  </span>
-                  <span className="action-title">{action.title}</span>
-                </div>
-                <p className="action-description">{action.description}</p>
-              </div>
+          <Button onClick={onExportPdf}>
+            <FileText />
+            Export Brief (PDF)
+          </Button>
+        </div>
+        <div className="mt-3">
+          <BriefStatus brief={brief} generation={generation} />
+        </div>
+        <p className="summary-body">{brief.summary}</p>
+        {generation.isGenerating && (
+          <div className="summary-loading" aria-hidden="true">
+            <Skeleton />
+            <Skeleton />
+          </div>
+        )}
+        {!!brief.evidence_citations?.length && (
+          <div className="citations-row">
+            <span className="citations-label">Supporting sources</span>
+            {brief.evidence_citations.map((citation, index) => (
+              <Button
+                className="citation-button"
+                key={`${citation}:${index}`}
+                onClick={() => setCitation(citation)}
+                aria-label={`Inspect citation ${citation}`}
+              >
+                {citation}
+              </Button>
             ))}
           </div>
-        </section>
-      )}
-
-      {/* 4. AI Prioritized Intelligence & Hypotheses */}
-      <div className="cockpit-2x2-grid">
-        <section className="cockpit-grid-card">
-          <div className="card-subhead-row">
-            <h2 className="card-subhead">Risk flags</h2>
-            {brief.prioritized_risks && brief.prioritized_risks.length > 0 && (
-              <span className="card-badge">{brief.prioritized_risks.length} AI prioritized</span>
-            )}
+        )}
+        <div className="updated-label">
+          <p>
+            {`Current source records as of ${formatDate(brief.as_of_date)}. ${brief.generation.mode === 'offline' || brief.generation.mode === 'rules' ? 'Source-based synthesis' : 'Verified AI synthesis'}${brief.latest_brief ? ` / Version ${brief.latest_brief.version ?? '-'}` : ''}.`}
+          </p>
+          {brief.telemetry && (
+            <div className="brief-telemetry-row mt-2">
+              <span>{brief.telemetry.model}</span>
+              <span>{brief.telemetry.total_tokens.toLocaleString()} tokens</span>
+              <span>{(brief.telemetry.latency_ms / 1000).toFixed(1)}s</span>
+              <span>Est. ${brief.telemetry.cost_usd.toFixed(4)}</span>
+            </div>
+          )}
+        </div>
+      </Card>
+      <div className="meeting-prep-grid">
+        <Card className="agenda-panel" aria-labelledby="agenda-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="agenda-title">
+              <Calendar size={20} />
+              Stewardship meeting agenda
+            </h2>
+            <Badge>{brief.agenda?.length ?? 0} topics</Badge>
           </div>
-          {brief.prioritized_risks && brief.prioritized_risks.length > 0 && (
-            <div className="ai-assessment-box">
-              <span className="ai-box-label">
-                <Sparkles size={11} /> AI Prioritized Risk Drivers
-              </span>
-              <ul className="ai-prioritized-list">
-                {brief.prioritized_risks.map((risk, idx) => (
-                  <li key={idx} className="ai-prioritized-item">
-                    {risk}
+          {brief.agenda?.length ? (
+            <ol className="agenda-numbered-list">
+              {brief.agenda.map((item, index) => (
+                <li key={index}>{item.replace(/^\d+\.\s*/, '')}</li>
+              ))}
+            </ol>
+          ) : (
+            <EmptyState title="No agenda recorded" />
+          )}
+        </Card>
+        <Card className="talking-points-panel" aria-labelledby="talking-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="talking-title">
+              <MessageSquare size={20} />
+              {userRole === 'Producer' ? 'Producer' : 'Leadership'} talking points
+            </h2>
+          </div>
+          {brief.talking_points?.length ? (
+            <ul className="talking-points-list">
+              {brief.talking_points.map((point, index) => {
+                const hypothesis = /hypothesis/i.test(point)
+                const fact = /^(confirmed fact:|fact:|confirmed discrepancy:)/i.test(point)
+                return (
+                  <li className="talking-point-item" key={index}>
+                    <Badge tone={hypothesis ? 'warning' : fact ? 'info' : 'neutral'}>
+                      {hypothesis ? 'Hypothesis' : fact ? 'Source fact' : 'Brief note'}
+                    </Badge>
+                    <span>
+                      {point.replace(
+                        /^(Confirmed fact:\s*|Fact:\s*|Hypothesis:\s*|Hypothesis \(unverified\):\s*)/i,
+                        ''
+                      )}
+                    </span>
                   </li>
-                ))}
-              </ul>
-            </div>
+                )
+              })}
+            </ul>
+          ) : (
+            <EmptyState title="No talking points recorded" />
           )}
-          {(!brief.prioritized_risks || brief.prioritized_risks.length === 0) && (
-            <p className="muted">No AI-prioritized risk flags.</p>
-          )}
-        </section>
-
-        <section className="cockpit-grid-card">
-          <div className="card-subhead-row">
-            <h2 className="card-subhead">Opportunity signals (hypotheses)</h2>
-            {brief.opportunity_hypotheses && brief.opportunity_hypotheses.length > 0 && (
-              <span className="card-badge">
-                {brief.opportunity_hypotheses.length} AI evaluated
-              </span>
-            )}
+        </Card>
+      </div>
+      {!!brief.suggested_actions?.length && (
+        <Card aria-labelledby="suggested-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="suggested-title">
+              <CheckSquare size={20} />
+              Suggested next actions
+            </h2>
+            <Badge>Review before acting</Badge>
           </div>
-          {brief.opportunity_hypotheses && brief.opportunity_hypotheses.length > 0 && (
-            <div className="ai-assessment-box opportunity-hyp-box">
-              <span className="ai-box-label">
-                <Sparkles size={11} /> AI Opportunity Hypotheses Governance
-              </span>
-              <ul className="ai-hypotheses-list">
-                {brief.opportunity_hypotheses.map((hyp, idx) => {
-                  const isHyp = hyp.toLowerCase().includes('hypothesis')
-                  return (
-                    <li key={idx} className={`ai-hypothesis-item ${isHyp ? 'is-hyp' : 'is-opp'}`}>
-                      <span className={`opp-pill ${isHyp ? 'pill-hyp' : 'pill-opp'}`}>
-                        {isHyp ? 'Hypothesis' : 'Opportunity'}
-                      </span>
-                      <span className="opp-text">{hyp}</span>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
+          <div className="actions-grid">
+            {brief.suggested_actions.map((action, index) => (
+              <article className="action-card" key={index}>
+                <Badge tone="info">
+                  {action.action_type === 'draft_followup'
+                    ? 'Follow-up'
+                    : action.action_type === 'review_task'
+                      ? 'Review'
+                      : 'Referral'}
+                </Badge>
+                <h3>{action.title}</h3>
+                <p>{action.description}</p>
+                <Button
+                  className="action-prepare"
+                  size="sm"
+                  onClick={() => setSelectedAction(action)}
+                >
+                  {action.action_type === 'draft_followup' ? 'Prepare draft' : 'Review action'}
+                </Button>
+              </article>
+            ))}
+          </div>
+        </Card>
+      )}
+      <div className="cockpit-2x2-grid">
+        <Card className="cockpit-grid-card" aria-labelledby="drivers-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="drivers-title">
+              Prioritized risk drivers
+            </h2>
+            <Badge>{brief.prioritized_risks?.length ?? 0}</Badge>
+          </div>
+          {brief.prioritized_risks?.length ? (
+            <ul className="ai-prioritized-list">
+              {brief.prioritized_risks.map((risk, index) => (
+                <li key={index}>{risk}</li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="No prioritized risk flags" />
           )}
-          {(!brief.opportunity_hypotheses || brief.opportunity_hypotheses.length === 0) && (
-            <p className="muted">No AI opportunity hypotheses.</p>
+        </Card>
+        <Card className="cockpit-grid-card" aria-labelledby="hypotheses-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="hypotheses-title">
+              Opportunity hypotheses
+            </h2>
+            <Badge tone="warning">Unverified</Badge>
+          </div>
+          {brief.opportunity_hypotheses?.length ? (
+            <ul className="ai-prioritized-list">
+              {brief.opportunity_hypotheses.map((hypothesis, index) => (
+                <li key={index}>{hypothesis}</li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="No opportunity hypotheses" />
           )}
           <p className="card-footer-muted">
             Validate assumptions with the client before recommending coverage.
           </p>
-        </section>
+        </Card>
       </div>
+      {citation && <CitationSheet key={`${brief.account.account_id}:${citation}`} brief={brief} reference={citation} onClose={() => setCitation(null)} />}
+      {selectedAction && (
+        <BriefActionDraft
+          key={`${selectedAction.title}:${selectedAction.description}`}
+          action={selectedAction}
+          brief={brief}
+          onClose={() => setSelectedAction(null)}
+        />
+      )}
     </div>
   )
 }

@@ -1,7 +1,28 @@
-import { useState, type FormEvent } from 'react'
-import { Eye, EyeOff, LockKeyhole } from 'lucide-react'
+﻿import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { ArrowRight, Building2, Eye, EyeOff, LockKeyhole } from 'lucide-react'
 import { postJson, type Session } from './api'
+import {
+  Accordion,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  FormDescription,
+  FormLabel,
+  FormMessage,
+  Input,
+} from './components/ui'
 import './SignIn.css'
+
+const signInSchema = z.object({
+  email: z.string().trim().email('Enter a valid work email address.').max(254),
+  password: z.string().min(1, 'Enter your password.').max(256),
+  remember_me: z.boolean(),
+})
+type SignInValues = z.infer<typeof signInSchema>
 
 export function SignIn({
   onSignIn,
@@ -10,180 +31,208 @@ export function SignIn({
   onSignIn: (session: Session) => void
   notice?: string
 }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  async function submit(event: FormEvent) {
-    event.preventDefault()
-    if (loading) return
-    setLoading(true)
-    setError('')
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInValues>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '', remember_me: false },
+  })
+  async function submit(values: SignInValues) {
     try {
-      onSignIn(
-        await postJson<Session>('/auth/login', {
-          email: email.trim(),
-          password,
-          remember_me: rememberMe,
-        })
-      )
+      onSignIn(await postJson<Session>('/auth/login', values))
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Sign-in failed. Please try again.')
-    } finally {
-      setLoading(false)
+      setError('root', {
+        message: error instanceof Error ? error.message : 'Sign-in failed. Please try again.',
+      })
     }
   }
-
   return (
     <div className="signin-container">
-      <div className="signin-left-pane">
+      <aside className="signin-left-pane" aria-label="About Meridian">
         <div className="signin-left-content">
           <header className="signin-brand-header">
-            <h1 className="signin-brand-name">Meridian Brokerage Group</h1>
-            <p className="signin-brand-motto">People. Protection. Progress.</p>
+            <span className="brand-mark" aria-hidden="true">
+              <Building2 size={28} />
+            </span>
+            <div>
+              <h1 className="signin-brand-name">Meridian Brokerage Group</h1>
+              <p className="signin-brand-motto">People. Protection. Progress.</p>
+            </div>
           </header>
           <div className="signin-hero-section">
+            <p className="eyebrow">Clarity for every client conversation</p>
             <h2 className="signin-hero-title">Walk into every renewal prepared.</h2>
             <p className="signin-hero-subtitle">
               Your clients, your priorities, and the evidence behind every risk and opportunity.
             </p>
             <div className="signin-features-list">
-              <div className="signin-feature-item">
-                <span className="feature-number-badge">1</span>
-                <div className="feature-text">
-                  <strong>Evidence first.</strong> Sources, dates and confidence stay alongside the
-                  conversation.
+              {[
+                ['Evidence first.', 'Sources, dates and confidence stay alongside every insight.'],
+                [
+                  'A workspace for your role.',
+                  'Your book of business or your authorized regional portfolio.',
+                ],
+                [
+                  'Human judgment at the center.',
+                  'Clear distinctions between confirmed facts and hypotheses.',
+                ],
+              ].map(([title, copy], index) => (
+                <div className="signin-feature-item" key={title}>
+                  <span className="feature-number-badge">{index + 1}</span>
+                  <div className="feature-text">
+                    <strong>{title}</strong>
+                    {copy}
+                  </div>
                 </div>
-              </div>
-              <div className="signin-feature-item">
-                <span className="feature-number-badge">2</span>
-                <div className="feature-text">
-                  <strong>A workspace for your role.</strong> Producers see their book. Regional
-                  leaders see their authorized portfolio.
-                </div>
-              </div>
-              <div className="signin-feature-item">
-                <span className="feature-number-badge">3</span>
-                <div className="feature-text">
-                  <strong>You stay in control.</strong> Review tasks and follow-up drafts wait for
-                  approval.
-                </div>
-              </div>
+              ))}
             </div>
           </div>
           <footer className="signin-left-footer">
             Synthetic demo data only. Meridian is a fictional broker.
           </footer>
         </div>
-      </div>
-      <div className="signin-right-pane">
-        <div className="signin-card">
-          <div className="signin-card-header">
-            <h2 className="signin-card-title">Sign in</h2>
-            <p className="signin-card-subtitle">Use your work account to open your workspace.</p>
-          </div>
+      </aside>
+      <main className="signin-right-pane" id="main-content">
+        <Card className="signin-card" aria-labelledby="signin-title">
+          <p className="eyebrow">Your client intelligence workspace</p>
+          <h2 id="signin-title" className="signin-card-title">
+            Sign in
+          </h2>
+          <p className="signin-card-subtitle">Use your work account to open your workspace.</p>
           {notice && (
             <p className="signin-notice" role="status">
               {notice}
             </p>
           )}
-          <form className="signin-form" onSubmit={submit}>
+          <form className="signin-form" onSubmit={handleSubmit(submit)} noValidate>
             <div className="role-callout-box">
-              <LockKeyhole size={16} />
+              <LockKeyhole size={16} aria-hidden="true" />
               <p>Your role and client access are assigned to your account.</p>
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="work-email">
-                Work email
-              </label>
-              <input
-                className="form-input"
+            <div>
+              <FormLabel htmlFor="work-email">Work email</FormLabel>
+              <Input
                 id="work-email"
                 type="email"
                 autoComplete="username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
                 autoFocus
+                disabled={isSubmitting}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : 'email-help'}
+                {...register('email')}
               />
+              {errors.email ? (
+                <FormMessage id="email-error">{errors.email.message}</FormMessage>
+              ) : (
+                <FormDescription id="email-help">
+                  Enter the email assigned to your Meridian account.
+                </FormDescription>
+              )}
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">
-                Password
-              </label>
+            <div>
+              <FormLabel htmlFor="password">Password</FormLabel>
               <div className="password-field">
-                <input
-                  className="form-input"
+                <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
+                  disabled={isSubmitting}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  {...register('password')}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                <Button
+                  size="icon"
+                  variant="ghost"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                  disabled={isSubmitting}
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
               </div>
+              {errors.password && (
+                <FormMessage id="password-error">{errors.password.message}</FormMessage>
+              )}
             </div>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                disabled={loading}
-              />{' '}
-              Remember me on this device
-            </label>
-            {error && (
-              <p className="signin-error" role="alert">
-                {error}
-              </p>
-            )}
-            <button className="button-submit-signin" type="submit" disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in'}
-            </button>
+            <div className="checkbox-label">
+              <Controller
+                control={control}
+                name="remember_me"
+                render={({ field }) => (
+                  <Checkbox
+                    id="remember-me"
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+              <FormLabel htmlFor="remember-me">Remember me on this device</FormLabel>
+            </div>
+            {errors.root && <FormMessage>{errors.root.message}</FormMessage>}
+            <Button
+              className="button-submit-signin"
+              variant="default"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Signing in…' : 'Sign in'}
+              <ArrowRight />
+            </Button>
           </form>
-          <details className="demo-accounts">
-            <summary>Synthetic demo accounts</summary>
-            <p>
-              Password for all three: <code>MeridianDemo!2026</code>
-            </p>
-            {[
-              ['Jordan Davis', 'jordan.davis@meridian.example', 'Producer'],
-              ['Priya Nair', 'priya.nair@meridian.example', 'Producer'],
-              ['Morgan Hayes', 'morgan.hayes@meridian.example', 'Regional Leader'],
-            ].map(([name, address, role]) => (
-              <button
-                type="button"
-                key={address}
-                onClick={() => {
-                  setEmail(address)
-                  setPassword('MeridianDemo!2026')
-                  setError('')
-                }}
-                disabled={loading}
-              >
-                <strong>{name}</strong>
-                <span>{role}</span>
-                <small>{address}</small>
-              </button>
-            ))}
-          </details>
+          <div className="demo-accounts">
+            <Accordion
+              sections={[
+                {
+                  id: 'demo-accounts',
+                  title: 'Synthetic demo accounts',
+                  content: (
+                    <>
+                      <p>
+                        Password for all three: <code>MeridianDemo!2026</code>
+                      </p>
+                      {[
+                        ['Jordan Davis', 'jordan.davis@meridian.example', 'Producer'],
+                        ['Priya Nair', 'priya.nair@meridian.example', 'Producer'],
+                        ['Morgan Hayes', 'morgan.hayes@meridian.example', 'Regional Leader'],
+                      ].map(([name, email, role]) => (
+                        <Button
+                          className="demo-account"
+                          key={email}
+                          disabled={isSubmitting}
+                          onClick={() => {
+                            setValue('email', email)
+                            setValue('password', 'MeridianDemo!2026')
+                            clearErrors()
+                          }}
+                        >
+                          <strong>{name}</strong>
+                          <Badge>{role}</Badge>
+                          <small>{email}</small>
+                        </Button>
+                      ))}
+                    </>
+                  ),
+                },
+              ]}
+            />
+          </div>
           <p className="signin-card-footer">
             Access is limited to your authorized clients. Sign-in and record access are logged.
           </p>
-        </div>
-      </div>
+        </Card>
+      </main>
     </div>
   )
 }

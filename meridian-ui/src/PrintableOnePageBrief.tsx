@@ -12,6 +12,10 @@ export function PrintableOnePageBrief({
 }) {
   const isComplete = !brief.claim_review?.omitted && !!brief.claim_review?.complete
   const telemetry = brief.telemetry
+  const synthesisLabel =
+    brief.generation.mode === 'live_ai' || brief.generation.mode === 'stored_ai'
+      ? 'Verified AI synthesis'
+      : 'Source-based synthesis'
 
   return (
     <div className="printable-brief-container" id="printable-ai-brief" aria-hidden="true">
@@ -23,7 +27,10 @@ export function PrintableOnePageBrief({
               <strong>MERIDIAN BROKERAGE GROUP</strong> | Client Intelligence Brief
             </span>
             <span className="print-meta-right">
-              Scenario Date: {formatDate(brief.as_of_date)} · GenAILab v{brief.latest_brief?.version ?? 1}
+              Source date: {formatDate(brief.as_of_date)} ·{' '}
+              {brief.latest_brief ? `Brief v${brief.latest_brief.version ?? '—'}` : 'Live records'}
+              {' · '}
+              {synthesisLabel}
             </span>
           </div>
 
@@ -32,8 +39,8 @@ export function PrintableOnePageBrief({
               <h1 className="print-client-name">{brief.account.name}</h1>
               <p className="print-client-sub">
                 {brief.account.industry || 'Commercial Lines'} ·{' '}
-                {[brief.account.city, brief.account.state].filter(Boolean).join(', ')} · Client since{' '}
-                {brief.account.client_since || 'N/A'}
+                {[brief.account.city, brief.account.state].filter(Boolean).join(', ')} · Client
+                since {brief.account.client_since || 'N/A'}
               </p>
             </div>
             <div className="print-kpi-chips">
@@ -115,7 +122,9 @@ export function PrintableOnePageBrief({
             {brief.talking_points && brief.talking_points.length > 0 && (
               <section className="print-section">
                 <h2 className="print-section-title">
-                  {userRole === 'Producer' ? 'Producer Talking Points' : 'Leadership Talking Points'}
+                  {userRole === 'Producer'
+                    ? 'Producer Talking Points'
+                    : 'Leadership Talking Points'}
                 </h2>
                 <ul className="print-talking-points">
                   {brief.talking_points.slice(0, 4).map((tp, idx) => {
@@ -123,7 +132,11 @@ export function PrintableOnePageBrief({
                     return (
                       <li key={idx} className={isHypothesis ? 'point-hyp' : 'point-fact'}>
                         <span className={`print-tag ${isHypothesis ? 'tag-hyp' : 'tag-fact'}`}>
-                          {isHypothesis ? 'HYPOTHESIS' : 'FACT'}
+                          {isHypothesis
+                            ? 'HYPOTHESIS'
+                            : /^(confirmed fact:|fact:|confirmed discrepancy:)/i.test(tp)
+                              ? 'SOURCE FACT'
+                              : 'BRIEF NOTE'}
                         </span>{' '}
                         <span>
                           {tp.replace(
@@ -213,7 +226,9 @@ export function PrintableOnePageBrief({
 
             {/* Grounded Evidence Records */}
             <section className="print-section">
-              <h2 className="print-section-title">Grounded Evidence Audit ({evidence.length} records)</h2>
+              <h2 className="print-section-title">
+                Grounded Evidence Audit ({evidence.length} records)
+              </h2>
               {evidence.length > 0 ? (
                 <div className="print-evidence-grid">
                   {evidence.slice(0, 4).map((item) => (
@@ -237,8 +252,8 @@ export function PrintableOnePageBrief({
         <footer className="print-footer">
           <p>
             <strong>CONFIDENTIAL · FOR PRODUCER PREPARATION ONLY.</strong> Factual enterprise data
-            combined with TCS GenAILab synthesis. Human review required prior to coverage binding or
-            client transmission.
+            and reviewed synthesis. Human review required prior to coverage binding or client
+            transmission.
           </p>
         </footer>
       </article>

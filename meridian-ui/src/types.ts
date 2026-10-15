@@ -21,6 +21,9 @@ export type Account = {
   days_to_renewal: number | null
   primary_contact_name: string | null
   primary_contact_role: string | null
+  restricted_flag: boolean
+  source_system: string | null
+  updated_at: string | null
 }
 
 export type Policy = {
@@ -32,6 +35,9 @@ export type Policy = {
   premium: number | string | null
   effective_date: string | null
   renewal_date: string | null
+  crm_renewal_date: string | null
+  crm_updated_at: string | null
+  updated_at: string | null
   status: string | null
   source_system: string | null
 }
@@ -85,13 +91,7 @@ export type DocumentItem = {
 }
 
 export type DetailTab =
-  | 'overview'
-  | 'ai-brief'
-  | 'policies'
-  | 'claims'
-  | 'billing'
-  | 'service-cases'
-  | 'documents'
+  'overview' | 'ai-brief' | 'policies' | 'claims' | 'billing' | 'service-cases' | 'documents'
 export type AccountDetail = Policy | Claim | Billing | ServiceCase | DocumentItem
 
 export type Evidence = {
@@ -165,6 +165,14 @@ export type SuggestedAction = {
 }
 
 export type AccountBrief = {
+  generation: {
+    mode: 'live_ai' | 'stored_ai' | 'rules' | 'offline'
+    stale: boolean
+    reason: string | null
+    can_generate: boolean
+    source_fingerprint: string
+    generated_at: string | null
+  }
   summary: string
   account: Account
   snapshot: {
@@ -221,4 +229,17 @@ export type AccountBrief = {
     ref_table?: string | null
     ref_id?: string | null
   }[]
+}
+
+export type BriefGenerationJob = {
+  job_id: string
+  account_id: string
+  source_fingerprint?: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  phase: 'queued' | 'collecting' | 'generating' | 'validating' | 'completed' | 'failed'
+  message: string
+  error: string | null
+  created_at: string
+  updated_at: string
+  result: AccountBrief | null
 }

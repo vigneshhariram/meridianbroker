@@ -1,324 +1,277 @@
 import {
   AlertTriangle,
+  ArrowRight,
   Calendar,
-  CheckCircle2,
   CheckSquare,
   Clock,
-  RefreshCw,
+  Files,
+  ShieldAlert,
   Sparkles,
+  Ticket,
 } from 'lucide-react'
 import type { AccountBrief, DetailTab } from './types'
-import { formatDate, formatMoney } from './format'
+import type { GenerationController } from './useBriefGeneration'
+import { formatDate, formatMoney, formatRenewal } from './format'
 import { SignalRow } from './AiBriefPanel'
-
-function formatEventType(type: string): string {
-  switch (type) {
-    case 'claim_opened':
-      return 'Claim Opened'
-    case 'meeting':
-      return 'Meeting'
-    case 'service_escalation':
-      return 'Service Escalation'
-    case 'service_case':
-      return 'Service Case'
-    case 'billing_overdue':
-      return 'Billing Overdue'
-    case 'commitment_overdue':
-      return 'Commitment Overdue'
-    case 'endorsement_requested':
-      return 'Endorsement'
-    default:
-      return type.replaceAll('_', ' ')
-  }
-}
+import { BriefStatus } from './BriefStatus'
+import { Badge, Button, Card, EmptyState, StatusBadge } from './components/ui'
 
 export function ClientOverviewPanel({
   brief,
   userRole = 'Producer',
   onSelectTab,
-  onRegenerate,
-  regenerating,
-  regenerateError,
+  generation,
 }: {
   brief: AccountBrief
   userRole?: string
   onSelectTab: (tab: DetailTab) => void
-  onRegenerate: () => void
-  regenerating: boolean
-  regenerateError?: string | null
+  generation: GenerationController
 }) {
+  const snapshots = [
+    {
+      label: 'Active policies',
+      value: brief.snapshot.policy_count,
+      detail: `${formatMoney(brief.account.annual_premium)} annual account premium`,
+      tab: 'policies' as const,
+      action: 'View policies',
+      icon: Files,
+    },
+    {
+      label: 'Open claims',
+      value: brief.snapshot.open_claim_count,
+      detail: brief.claim_review.complete ? 'Full claims review' : 'Review needed',
+      tab: 'claims' as const,
+      action: 'View claims',
+      icon: ShieldAlert,
+    },
+    {
+      label: 'Open service cases',
+      value: brief.snapshot.open_service_case_count,
+      detail: 'Active service tickets',
+      tab: 'service-cases' as const,
+      action: 'View service cases',
+      icon: Ticket,
+    },
+    {
+      label: 'Next renewal',
+      value:
+        brief.days_to_renewal == null
+          ? 'Not set'
+          : brief.days_to_renewal < 0
+            ? `${Math.abs(brief.days_to_renewal)}d overdue`
+            : `${brief.days_to_renewal}d`,
+      detail: brief.account.risk_level
+        ? `${brief.account.risk_level} renewal risk`
+        : 'Risk not recorded',
+      tab: 'ai-brief' as const,
+      action: 'Brief & prep',
+      icon: Calendar,
+    },
+  ]
+  const factualRisks = brief.risks.filter((signal) => signal.is_fact).length
+  const hypotheses = brief.opportunities.filter((signal) => !signal.is_fact).length
   return (
     <div className="client-overview-panel">
-      {/* 1. Operational Snapshot KPI Grid */}
-      <div className="snapshot-grid">
-        <div className="panel snapshot-card blue">
-          <div className="snapshot-label">Active Policies & Annual Premium</div>
-          <div className="snapshot-bottom">
-            <strong>{brief.snapshot.policy_count} Active</strong>
-            <span>{formatMoney(brief.account.annual_premium)}/yr</span>
-          </div>
-          <button
-            type="button"
-            className="card-quick-action"
-            onClick={() => onSelectTab('policies')}
-          >
-            View policies →
-          </button>
-        </div>
-
-        <div className="panel snapshot-card coral">
-          <div className="snapshot-label">Open Claims</div>
-          <div className="snapshot-bottom">
-            <strong>{brief.snapshot.open_claim_count}</strong>
-            <span>{brief.claim_review.complete ? 'Full claims review' : 'Review needed'}</span>
-          </div>
-          <button
-            type="button"
-            className="card-quick-action"
-            onClick={() => onSelectTab('claims')}
-          >
-            View claims →
-          </button>
-        </div>
-
-        <div className="panel snapshot-card">
-          <div className="snapshot-label">Open Service Cases</div>
-          <div className="snapshot-bottom">
-            <strong>{brief.snapshot.open_service_case_count}</strong>
-            <span>Active service tickets</span>
-          </div>
-          <button
-            type="button"
-            className="card-quick-action"
-            onClick={() => onSelectTab('service-cases')}
-          >
-            View service cases →
-          </button>
-        </div>
-
-        <div className="panel snapshot-card green">
-          <div className="snapshot-label">Renewal Due</div>
-          <div className="snapshot-bottom">
-            <strong>{brief.days_to_renewal != null ? `${brief.days_to_renewal}d` : '—'}</strong>
-            <span className={`mini-risk ${brief.account.risk_level ?? 'low'}`}>
-              {brief.account.risk_level ?? 'low'} risk
-            </span>
-          </div>
-          <button
-            type="button"
-            className="card-quick-action"
-            onClick={() => onSelectTab('ai-brief')}
-          >
-            Brief & prep →
-          </button>
-        </div>
-      </div>
-
-      {/* 2. AI Intelligence Status Pill & Scenario 1 Banner */}
-      <section className="panel ai-overview-callout">
-        <div className="ai-callout-header">
-          <div className="ai-callout-left">
-            <span className="ai-brief-pill">
-              <Sparkles size={13} /> {userRole === 'Producer' ? 'Producer' : 'Leadership'} AI Brief v{brief.latest_brief?.version ?? 1}
-            </span>
-            {brief.claim_review.omitted || !brief.claim_review.complete ? (
-              <span className="ai-callout-status">
-                Synthesis pending · Scenario alert active
-              </span>
-            ) : (
-              <span className="completeness-badge">
-                <CheckCircle2 size={13} />
-                {`${brief.claim_review.reviewed} of ${brief.claim_review.total} accessible open claims reviewed`}
-              </span>
-            )}
-            {brief.telemetry && (
-              <span className="telemetry-pill">
-                {brief.telemetry.model} · {(brief.telemetry.latency_ms / 1000).toFixed(1)}s
-              </span>
-            )}
-          </div>
-        </div>
-
-        {regenerateError && (
-          <div className="error-banner" role="alert" style={{ marginTop: '8px' }}>
-            {regenerateError}
-          </div>
-        )}
-
-        {(brief.claim_review.omitted || !brief.claim_review.complete) && (
-          <div className="completeness-alert-box" role="alert">
-            <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div style={{ flex: 1 }}>
-              <strong>Scenario Alert: Material Record Omission Detected</strong>
-              <p>
-                {brief.claim_review.omitted
-                  ? `A material record (${brief.claim_review.omitted}) was omitted from the initial brief summary.`
-                  : 'Open claim records require synthesis.'}{' '}
-                Click <strong>"Regenerate AI Brief"</strong> to synthesize full grounded context
-                with the Client Intelligence Agent.
-              </p>
+      <section className="snapshot-grid" aria-label="Client operational snapshot">
+        {snapshots.map(({ label, value, detail, tab, action, icon: Icon }) => (
+          <Card className="snapshot-card" key={label}>
+            <Icon size={20} className="snapshot-icon" aria-hidden="true" />
+            <span className="snapshot-label">{label}</span>
+            <div className="snapshot-bottom">
+              <strong>{value}</strong>
+              <span>{detail}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-              <span className="completeness-badge alert" role="status">
-                <AlertTriangle size={13} />
-                {brief.claim_review.omitted
-                  ? `Completeness failed: ${brief.claim_review.omitted} omitted`
-                  : !brief.permissions?.claims
-                    ? 'Claim access restricted'
-                    : 'Completeness check failed'}
-              </span>
-              <button
-                className="regenerate-btn"
-                onClick={onRegenerate}
-                disabled={regenerating}
-                title="Regenerate brief using TCS GenAILab GPT-4o Model"
-              >
-                {regenerating ? (
-                  <>
-                    <RefreshCw size={12} className="spin-icon" />
-                    Synthesizing...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={12} />
-                    Regenerate AI Brief
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+            <Button variant="ghost" className="card-quick-action" onClick={() => onSelectTab(tab)}>
+              {action}
+              <ArrowRight />
+            </Button>
+          </Card>
+        ))}
       </section>
-
-      {/* 3. Relationship Journey Timeline */}
-      <section className="panel timeline-card-panel">
+      <Card className="ai-overview-callout" aria-labelledby="readiness-title">
         <div className="panel-header-row">
-          <h2 className="card-subhead">
-            <Clock size={15} /> Relationship Journey Timeline
+          <h2 className="panel-label" id="readiness-title">
+            <Sparkles size={20} />
+            {userRole === 'Producer' ? 'Producer' : 'Leadership'} intelligence
           </h2>
-          <span className="card-badge">
-            {brief.timeline ? brief.timeline.length : 0} multi-system events
-          </span>
+          <Badge tone="info">
+            {brief.latest_brief ? `Version ${brief.latest_brief.version ?? '—'}` : 'Live records'}
+          </Badge>
         </div>
-        {brief.timeline && brief.timeline.length > 0 ? (
-          <div className="timeline-items-list">
-            {brief.timeline.map((event) => (
-              <div key={event.event_id} className="timeline-item-row">
-                <span className="timeline-date">{formatDate(event.event_date)}</span>
-                <span className={`timeline-type-badge ${event.event_type}`}>
-                  {formatEventType(event.event_type)}
-                </span>
-                <span className="timeline-title">{event.title}</span>
-                {event.ref_id && <span className="timeline-ref-id">{event.ref_id}</span>}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="muted" style={{ padding: '8px 0', margin: 0 }}>
-            No relationship events recorded in enterprise timeline.
-          </p>
-        )}
-      </section>
-
-      {/* 4. Commitments & Milestones Grid */}
-      <div className="cockpit-2x2-grid" style={{ marginTop: '12px' }}>
-        <section className="cockpit-grid-card">
-          <div className="panel-header-row" style={{ marginBottom: '8px' }}>
-            <h2 className="card-subhead">
-              <CheckSquare size={14} /> Open Commitments
+        <BriefStatus brief={brief} generation={generation} />
+        <p className="overview-summary">{brief.summary}</p>
+        <Button
+          variant="ghost"
+          className="overview-brief-link"
+          onClick={() => onSelectTab('ai-brief')}
+        >
+          Open full brief
+          <ArrowRight />
+        </Button>
+      </Card>
+      <div className="cockpit-2x2-grid">
+        <Card className="cockpit-grid-card" aria-labelledby="commitments-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="commitments-title">
+              <CheckSquare size={20} />
+              Open commitments
             </h2>
-            <span className="card-badge">{brief.commitments.length}</span>
+            <Badge>{brief.commitments.length}</Badge>
           </div>
-          <div className="card-list-items">
-            {brief.commitments.map((item) => (
-              <div className="commitment-line" key={item.commitment_id}>
-                <span className="commit-title">{item.description}</span>
-                <span className={item.status === 'overdue' ? 'overdue-tag' : 'date-tag'}>
-                  {item.status === 'overdue' && 'Overdue · '}
-                  {formatDate(item.due_date)}
-                </span>
-              </div>
-            ))}
-            {!brief.commitments.length && <p className="muted">No open commitments.</p>}
-          </div>
-        </section>
-
-        <section className="cockpit-grid-card">
-          <div className="panel-header-row" style={{ marginBottom: '8px' }}>
-            <h2 className="card-subhead">
-              <Calendar size={14} /> Renewal Milestones
+          {brief.commitments.length ? (
+            brief.commitments.map((item) => (
+              <article className="commitment-line" key={item.commitment_id}>
+                <div>
+                  <p>{item.description}</p>
+                  <small>
+                    Due {formatDate(item.due_date)} · Owner {item.owner_user_id ?? 'not assigned'}
+                  </small>
+                </div>
+                <StatusBadge status={item.status} />
+              </article>
+            ))
+          ) : (
+            <EmptyState title="No open commitments" />
+          )}
+        </Card>
+        <Card className="cockpit-grid-card" aria-labelledby="milestones-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="milestones-title">
+              <Calendar size={20} />
+              Renewal milestones
             </h2>
-            <span className="card-badge">{brief.milestones.length}</span>
+            <Badge>{brief.milestones.length}</Badge>
           </div>
-          <div className="card-list-items">
-            {brief.milestones.map((item) => (
-              <div className="milestone-line" key={item.milestone_id}>
-                <span>{item.milestone}</span>
-                <span className="date-tag">{formatDate(item.due_date)}</span>
-              </div>
-            ))}
-            {!brief.milestones.length && <p className="muted">No renewal milestones scheduled.</p>}
-          </div>
-        </section>
+          {brief.milestones.length ? (
+            brief.milestones.map((item) => (
+              <article className="milestone-line" key={item.milestone_id}>
+                <div>
+                  <p>{item.milestone}</p>
+                  <small>{formatDate(item.due_date)}</small>
+                </div>
+                <StatusBadge status={item.status} />
+              </article>
+            ))
+          ) : (
+            <EmptyState title="No milestones scheduled" />
+          )}
+          <p className="card-footer-muted">Next renewal: {formatRenewal(brief.days_to_renewal)}</p>
+        </Card>
       </div>
-
-      {/* 5. Actual risk & opportunity signals (factual, DB-backed) */}
-      <div className="cockpit-2x2-grid" style={{ marginTop: '12px' }}>
-        <section className="cockpit-grid-card">
-          <div className="card-subhead-row">
-            <h2 className="card-subhead">Risk flags</h2>
-            <span className="card-badge">{brief.risks.length} factual</span>
+      <div className="cockpit-2x2-grid risk-opportunity-grid">
+        <Card className="cockpit-grid-card" aria-labelledby="risk-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="risk-title">
+              Risk flags
+            </h2>
+            <Badge>
+              {factualRisks} facts · {brief.risks.length - factualRisks} hypotheses
+            </Badge>
           </div>
-          <div className="card-list-items">
+          <div>
             {brief.risks.map((signal) => (
               <SignalRow signal={signal} key={signal.signal_id} />
             ))}
-            {!brief.risks.length && <p className="muted">No supported risk flags.</p>}
+            {!brief.risks.length && <EmptyState title="No supported risk flags" />}
           </div>
-        </section>
-        <section className="cockpit-grid-card">
-          <div className="card-subhead-row">
-            <h2 className="card-subhead">Opportunity signals (hypotheses)</h2>
-            <span className="card-badge">{brief.opportunities.length} factual</span>
+        </Card>
+        <Card className="cockpit-grid-card" aria-labelledby="opportunities-title">
+          <div className="panel-header-row">
+            <h2 className="card-subhead" id="opportunities-title">
+              Opportunity signals
+            </h2>
+            <Badge tone="warning">{hypotheses} hypotheses</Badge>
           </div>
-          <div className="card-list-items">
+          <div>
             {brief.opportunities.map((signal) => (
               <SignalRow signal={signal} key={signal.signal_id} />
             ))}
             {!brief.opportunities.length && (
-              <p className="muted">Insufficient accessible evidence for an opportunity.</p>
+              <EmptyState
+                title="No supported opportunities"
+                description="Insufficient accessible evidence for an opportunity."
+              />
             )}
           </div>
-          <p className="card-footer-muted">Validate assumptions with the client before recommending coverage.</p>
-        </section>
+          <p className="card-footer-muted">
+            Validate assumptions with the client before recommending coverage.
+          </p>
+        </Card>
       </div>
-
-      {/* 6. Cross-System Contradictions (if any) */}
-      {brief.contradictions && brief.contradictions.length > 0 && (
-        <section className="panel contradictions-panel" style={{ marginTop: '12px' }}>
+      {!!brief.contradictions.length && (
+        <Card aria-labelledby="conflicts-title">
           <div className="panel-header-row">
-            <h2 className="card-subhead">
-              <AlertTriangle size={15} color="#b45309" /> Cross-System Data Discrepancies
+            <h2 className="card-subhead" id="conflicts-title">
+              <AlertTriangle size={20} />
+              Cross-system discrepancies
             </h2>
-            <span className="card-badge">{brief.contradictions.length} detected</span>
+            <Badge tone="warning">{brief.contradictions.length} need review</Badge>
           </div>
-          <div style={{ display: 'grid', gap: '8px' }}>
-            {brief.contradictions.map((conflict) => (
-              <div className="conflict-card-banner" key={conflict.contradiction_id}>
-                <span className="conflict-title">
-                  {(conflict.field ?? 'Record').replaceAll('_', ' ')} differs across systems.
-                </span>
-                <span className="conflict-sub">
-                  {conflict.source_a}: <strong>{conflict.value_a}</strong> vs {conflict.source_b}:{' '}
-                  <strong>{conflict.value_b}</strong>
-                  <br />
-                  Human review required prior to client communication.
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+          {brief.contradictions.map((conflict) => (
+            <article className="conflict-card-banner" key={conflict.contradiction_id}>
+              <span className="conflict-title">
+                {(conflict.field ?? 'Record').replaceAll('_', ' ')} differs across systems.
+              </span>
+              <span className="conflict-sub">
+                {conflict.source_a}: <strong>{conflict.value_a}</strong>
+                <br />
+                {conflict.source_b}: <strong>{conflict.value_b}</strong>
+                <br />
+                Human review required before client communication.
+              </span>
+            </article>
+          ))}
+        </Card>
       )}
+      <Card className="timeline-card-panel" aria-labelledby="journey-title">
+        <div className="panel-header-row">
+          <h2 className="card-subhead" id="journey-title">
+            <Clock size={20} />
+            Relationship journey timeline
+          </h2>
+          <Badge>{brief.timeline.length} events</Badge>
+        </div>
+        {brief.timeline.length ? (
+          <div className="timeline-items-list">
+            {brief.timeline.map((event) => {
+              const tab = (
+                {
+                  claims: 'claims',
+                  policies: 'policies',
+                  service_cases: 'service-cases',
+                  billing: 'billing',
+                  documents: 'documents',
+                } as Record<string, DetailTab>
+              )[event.ref_table ?? '']
+              return (
+                <article key={event.event_id} className="timeline-item-row">
+                  <time className="timeline-date" dateTime={event.event_date}>
+                    {formatDate(event.event_date)}
+                  </time>
+                  <div>
+                    <Badge>{event.event_type.replaceAll('_', ' ')}</Badge>
+                    <span className="timeline-title">{event.title}</span>
+                    {tab ? (
+                      <Button
+                        variant="ghost"
+                        className="p-0 text-xs"
+                        onClick={() => onSelectTab(tab)}
+                      >
+                        Inspect {event.ref_id}
+                        <ArrowRight />
+                      </Button>
+                    ) : (
+                      event.ref_id && <span className="timeline-ref-id">{event.ref_id}</span>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        ) : (
+          <EmptyState title="No relationship events recorded" />
+        )}
+      </Card>
     </div>
   )
 }

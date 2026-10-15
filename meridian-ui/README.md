@@ -53,7 +53,7 @@ npm.cmd run dev
 
 Open the URL printed by Vite, typically <http://localhost:5173/>.
 
-Vite proxies `/accounts`, `/copilot`, `/actions`, `/feedback`, `/admin`, and `/portfolio` requests to `http://localhost:8000` as configured in `vite.config.ts`. Keep the API running on port `8000` for these requests to work.
+Vite proxies `/auth`, `/accounts`, and `/portfolio` requests to `http://127.0.0.1:8000` as configured in `vite.config.ts`. Keep the API running on port `8000` for these requests to work.
 
 ## Other commands
 
@@ -87,3 +87,39 @@ meridian-ui/
 Credentials determine the workspace: producers see their own book; regional leaders see their authorized regional portfolio. The UI restores valid sessions and revokes them on sign-out. Vite also proxies `/auth`; an optional `MERIDIAN_API_TARGET` environment variable overrides the default API URL for isolated verification.
 
 See [regional dashboard implementation](../docs/regional-dashboard-implementation.md) for synthetic login accounts, dashboard behavior, API/data details, and test instructions.
+
+## Enterprise component system and verification
+
+The latest [compact workspace and AI integration report](../docs/hub-refresh-and-ai.md) covers
+the card view, denser layouts, automatic preparation on client load, persistent background
+generation, scoped caching, progress, retry, provenance and editable action drafts.
+
+The UI uses source-owned shadcn-style Radix components, Tailwind CSS, Lucide, TanStack Table v8, React Hook Form/Zod, and Sonner. The shared theme supplies navy/cerulean colors, 40px controls, accessible focus rings, tabular numerals and responsive grids. Regional and resource tables support search, sorting, pagination, column visibility and keyboard row navigation. Source records open in focus-trapped inspection sheets. The client workspace includes risk/renewal filters and evidence/confidence inspection.
+
+See [frontend audit and verification](../docs/frontend-overhaul.md) for the current route manifest, implementation details, screenshots and limitations. This manifest takes precedence over older documentation describing routes absent from the current backend.
+
+Run `npm.cmd run typecheck`, `npm.cmd run lint`, and `npm.cmd run build` for the frontend quality gate.
+
+Browser verification requires Python packages `playwright` and `pypdf`, Microsoft Edge, and the npm development dependencies (including `axe-core`). It uses a temporary database and the existing deterministic generation fallback; it does not call the configured LLM gateway. Start the fixture in one terminal:
+
+```powershell
+cd meridian-ui
+npm.cmd run test:fixture
+```
+
+Start Vite against that fixture in a second terminal:
+
+```powershell
+cd meridian-ui
+$env:MERIDIAN_API_TARGET = 'http://127.0.0.1:8011'
+npm.cmd run dev -- --host 127.0.0.1 --port 5174 --strictPort
+```
+
+Run the browser suite in a third terminal:
+
+```powershell
+cd meridian-ui
+npm.cmd run test:browser -- --url http://127.0.0.1:5174 --output ../docs/validation/enterprise
+```
+
+Restart the fixture before repeating the suite so the omission scenario starts from its original seed state. Stop both fixture processes after verification; use the normal API for application development.

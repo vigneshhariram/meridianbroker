@@ -1,0 +1,57 @@
+{
+  "account_id": "A03",
+  "account_name": "Pinecrest Retail Group",
+  "as_of": "2026-10-08",
+  "measured_at": "2026-10-15T06:23:55Z",
+  "method": "One structured source-grounded request/model; no repair or fallback; two concurrent workers; read-only DB",
+  "results": [
+    {
+      "model": "genailab-maas-gpt-35-turbo",
+      "status": "passed",
+      "reason": null,
+      "tokens": 2328,
+      "elapsed_seconds": 8.08
+    },
+    {
+      "model": "genailab-maas-gpt-4o",
+      "status": "passed",
+      "reason": null,
+      "tokens": 2313,
+      "elapsed_seconds": 5.37
+    },
+    {
+      "model": "gemini-2.5-pro",
+      "status": "passed",
+      "reason": null,
+      "tokens": 3708,
+      "elapsed_seconds": 17.59
+    },
+    {
+      "model": "gemini-2.5-flash",
+      "status": "passed",
+      "reason": null,
+      "tokens": 3275,
+      "elapsed_seconds": 9.77
+    },
+    {
+      "model": "gemini-2.5-flash-lite",
+      "status": "passed",
+      "reason": null,
+      "tokens": 2663,
+      "elapsed_seconds": 2.93
+    }
+  ],
+  "selected_configuration": {
+    "primary": "gemini-2.5-flash-lite",
+    "fallback": "genailab-maas-gpt-4o",
+    "provider_request_timeout_seconds": 10.0,
+    "generation_budget_seconds": 22.0,
+    "browser_request_timeout_seconds": 30
+  },
+  "pipeline_confirmation": {
+    "model": "gemini-2.5-flash-lite",
+    "passed": true,
+    "latency_seconds": 3.82,
+    "fallback_used": false
+  }
+}

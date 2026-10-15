@@ -1,0 +1,79 @@
+[
+  {
+    "view": "sign-in",
+    "violations": [],
+    "passes": 36,
+    "incomplete": []
+  },
+  {
+    "view": "regional-portfolio",
+    "violations": [],
+    "passes": 47,
+    "incomplete": []
+  },
+  {
+    "view": "regional-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "leadership-brief",
+    "violations": [],
+    "passes": 44,
+    "incomplete": []
+  },
+  {
+    "view": "producer-overview",
+    "violations": [],
+    "passes": 42,
+    "incomplete": []
+  },
+  {
+    "view": "policy-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "document-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "claims-table",
+    "violations": [],
+    "passes": 47,
+    "incomplete": []
+  },
+  {
+    "view": "expanded-signal-evidence",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "producer-ai-brief",
+    "violations": [],
+    "passes": 44,
+    "incomplete": []
+  },
+  {
+    "view": "restricted-documents",
+    "violations": [],
+    "passes": 44,
+    "incomplete": []
+  }
+]

@@ -1,0 +1,181 @@
+[
+  {
+    "view": "sign-in",
+    "violations": [],
+    "passes": 36,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "sign-in-mobile",
+    "violations": [],
+    "passes": 35,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "regional-client-cards",
+    "violations": [],
+    "passes": 43,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "regional-client-cards-mobile",
+    "violations": [],
+    "passes": 43,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "regional-portfolio",
+    "violations": [],
+    "passes": 46,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "regional-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "leadership-brief",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "regional-dashboard-mobile",
+    "violations": [],
+    "passes": 47,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "producer-loading-skeleton",
+    "violations": [],
+    "passes": 39,
+    "incomplete": []
+  },
+  {
+    "view": "producer-overview",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "producer-dashboard-mobile",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "policy-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "document-record-sheet",
+    "violations": [],
+    "passes": 33,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "claims-table",
+    "violations": [],
+    "passes": 47,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "expanded-signal-evidence",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "generation-retry-with-current-cards",
+    "violations": [],
+    "passes": 41,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "generation-progress",
+    "violations": [],
+    "passes": 43,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "producer-ai-brief",
+    "violations": [],
+    "passes": 43,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "producer-ai-brief-mobile",
+    "violations": [],
+    "passes": 44,
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "ai-citation-record",
+    "violations": [],
+    "passes": 35,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "review-action-draft",
+    "violations": [],
+    "passes": 36,
+    "incomplete": [
+      "aria-hidden-focus",
+      "color-contrast"
+    ]
+  },
+  {
+    "view": "restricted-documents",
+    "violations": [],
+    "passes": 43,
+    "incomplete": [
+      "color-contrast"
+    ]
+  }
+]

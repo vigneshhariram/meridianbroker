@@ -10,6 +10,7 @@ import unittest
 import uuid
 from http.cookies import SimpleCookie
 from pathlib import Path
+from unittest.mock import patch
 from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -93,6 +94,13 @@ class ApiClient:
 
 class WorkspaceTests(unittest.TestCase):
     def setUp(self):
+        self.model_patch = patch.object(
+            main.ClientIntelligenceAgent,
+            "_call_model",
+            side_effect=RuntimeError("Provider disabled during isolated verification"),
+        )
+        self.model_patch.start()
+        self.addCleanup(self.model_patch.stop)
         self.uri = f"file:meridian_test_{uuid.uuid4().hex}?mode=memory&cache=shared"
         self.anchor = sqlite3.connect(self.uri, uri=True, check_same_thread=False)
         self.anchor.row_factory = sqlite3.Row
@@ -101,6 +109,9 @@ class WorkspaceTests(unittest.TestCase):
                 Path(__file__).resolve().parents[1] / "sql/meridian_schema_and_seed_sqlite.sql"
             ).read_text(encoding="utf-8")
         )
+        fixtures_path = Path(__file__).resolve().parents[1] / "sql/fixtures/legacy_generated_briefs_sqlite.sql"
+        if fixtures_path.exists():
+            self.anchor.executescript(fixtures_path.read_text(encoding="utf-8"))
         initialize_security(self.anchor)
         self.previous = main._get_database_connection
 

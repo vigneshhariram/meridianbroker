@@ -91,11 +91,13 @@ export function RegionalDashboard({
   onSignOut,
   onOpenBrief,
   signingOut,
+  embedded = false,
 }: {
   user: UserProfile
   onSignOut: () => void
   onOpenBrief: (id: string) => void
   signingOut: boolean
+  embedded?: boolean
 }) {
   const client = useQueryClient()
   const [producer, setProducer] = useState('')
@@ -129,7 +131,7 @@ export function RegionalDashboard({
       ),
     [portfolio?.accounts, cardSearch]
   )
-  const selectableAccounts = view === 'cards' ? visibleCards : portfolio?.accounts ?? []
+  const selectableAccounts = view === 'cards' ? visibleCards : (portfolio?.accounts ?? [])
   const selected =
     selectableAccounts.find((row) => row.account_id === selectedId) ?? selectableAccounts[0]
   const filtered = !!producer || !!risk || horizon !== '0'
@@ -256,6 +258,10 @@ export function RegionalDashboard({
   async function refresh() {
     try {
       await Promise.all([
+        client.refetchQueries(
+          { queryKey: ['brief', user.userId], type: 'active' },
+          { throwOnError: true }
+        ),
         client.refetchQueries({ queryKey: ['portfolio'], type: 'active' }, { throwOnError: true }),
         client.refetchQueries(
           { queryKey: ['portfolio-producers'], type: 'active' },
@@ -269,13 +275,15 @@ export function RegionalDashboard({
   }
   return (
     <div className="app-shell regional-shell">
-      <Header
-        user={user}
-        subtitle={`Regional portfolio / ${user.region}`}
-        onSignOut={onSignOut}
-        signingOut={signingOut}
-        onOpenAccount={onOpenBrief}
-      />
+      {!embedded && (
+        <Header
+          user={user}
+          subtitle={`Regional portfolio / ${user.region}`}
+          onSignOut={onSignOut}
+          signingOut={signingOut}
+          onOpenAccount={onOpenBrief}
+        />
+      )}
       <div className="regional-layout">
         <main className="regional-main" id="main-content" tabIndex={-1}>
           <section className="regional-title-row" aria-labelledby="portfolio-title">
@@ -455,86 +463,85 @@ export function RegionalDashboard({
                     </div>
                     <div className="portfolio-cards">
                       {visibleCards.map((row) => (
-                          <article
-                            className={`portfolio-client-card ${selected?.account_id === row.account_id ? 'selected' : ''}`}
-                            key={row.account_id}
-                            aria-labelledby={`card-${row.account_id}`}
-                            aria-current={selected?.account_id === row.account_id ? 'true' : undefined}
-                            onClick={(event) => {
-                              if (!(event.target as HTMLElement).closest('button,a,input')) {
-                                setSelectedId(row.account_id)
-                              }
-                            }}
-                          >
-                            <div className="portfolio-card-heading">
-                              <h3 id={`card-${row.account_id}`}>
-                                <button
-                                  type="button"
-                                  className="portfolio-card-select"
-                                  aria-pressed={selected?.account_id === row.account_id}
-                                  aria-controls="selected-client-details"
-                                  onClick={() => setSelectedId(row.account_id)}
-                                >
-                                  {row.name}
-                                </button>
-                              </h3>
-                              <StatusBadge status={row.risk_level} />
+                        <article
+                          className={`portfolio-client-card ${selected?.account_id === row.account_id ? 'selected' : ''}`}
+                          key={row.account_id}
+                          aria-labelledby={`card-${row.account_id}`}
+                          aria-current={
+                            selected?.account_id === row.account_id ? 'true' : undefined
+                          }
+                          onClick={(event) => {
+                            if (!(event.target as HTMLElement).closest('button,a,input')) {
+                              setSelectedId(row.account_id)
+                            }
+                          }}
+                        >
+                          <div className="portfolio-card-heading">
+                            <h3 id={`card-${row.account_id}`}>
+                              <button
+                                type="button"
+                                className="portfolio-card-select"
+                                aria-pressed={selected?.account_id === row.account_id}
+                                aria-controls="selected-client-details"
+                                onClick={() => setSelectedId(row.account_id)}
+                              >
+                                {row.name}
+                              </button>
+                            </h3>
+                            <StatusBadge status={row.risk_level} />
+                          </div>
+                          <p className="portfolio-card-meta">{row.producer_name}</p>
+                          <dl className="portfolio-card-metrics">
+                            <div>
+                              <dt>Annual premium</dt>
+                              <dd>{formatMoney(row.annual_premium)}</dd>
                             </div>
-                            <p className="portfolio-card-meta">{row.producer_name}</p>
-                            <dl className="portfolio-card-metrics">
-                              <div>
-                                <dt>Annual premium</dt>
-                                <dd>{formatMoney(row.annual_premium)}</dd>
-                              </div>
-                              <div>
-                                <dt>Next renewal</dt>
-                                <dd>{formatRenewal(row.days_to_renewal)}</dd>
-                              </div>
-                            </dl>
-                            <div className="portfolio-card-signal">
-                              {row.top_signal ? (
-                                <>
-                                  <p>{row.top_signal.title}</p>
-                                  <Badge tone={row.top_signal.is_fact ? 'info' : 'warning'}>
-                                    {row.top_signal.is_fact ? 'Fact' : 'Hypothesis'} /{' '}
-                                    {Math.round(row.top_signal.confidence * 100)}%
-                                  </Badge>
-                                </>
-                              ) : (
-                                <p className="muted">No active risk signals</p>
-                              )}
+                            <div>
+                              <dt>Next renewal</dt>
+                              <dd>{formatRenewal(row.days_to_renewal)}</dd>
                             </div>
-                            <div className="flag-list">
-                              {row.flags.map((flag) => (
-                                <Badge
-                                  key={flag}
-                                  tone={flag === 'Overdue' ? 'critical' : 'warning'}
-                                >
-                                  {flag}
+                          </dl>
+                          <div className="portfolio-card-signal">
+                            {row.top_signal ? (
+                              <>
+                                <p>{row.top_signal.title}</p>
+                                <Badge tone={row.top_signal.is_fact ? 'info' : 'warning'}>
+                                  {row.top_signal.is_fact ? 'Fact' : 'Hypothesis'} /{' '}
+                                  {Math.round(row.top_signal.confidence * 100)}%
                                 </Badge>
-                              ))}
-                            </div>
-                            <div className="portfolio-card-footer">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                aria-label={`Inspect ${row.name}`}
-                                onClick={() => inspect(row)}
-                              >
-                                Inspect
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="default"
-                                onClick={() => onOpenBrief(row.account_id)}
-                                aria-label={`Open brief for ${row.name}`}
-                              >
-                                Open brief
-                                <ArrowRight />
-                              </Button>
-                            </div>
-                          </article>
-                        ))}
+                              </>
+                            ) : (
+                              <p className="muted">No active risk signals</p>
+                            )}
+                          </div>
+                          <div className="flag-list">
+                            {row.flags.map((flag) => (
+                              <Badge key={flag} tone={flag === 'Overdue' ? 'critical' : 'warning'}>
+                                {flag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="portfolio-card-footer">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-label={`Inspect ${row.name}`}
+                              onClick={() => inspect(row)}
+                            >
+                              Inspect
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => onOpenBrief(row.account_id)}
+                              aria-label={`Open brief for ${row.name}`}
+                            >
+                              Open brief
+                              <ArrowRight />
+                            </Button>
+                          </div>
+                        </article>
+                      ))}
                     </div>
                     {!visibleCards.length && (
                       <EmptyState
@@ -610,7 +617,11 @@ export function RegionalDashboard({
                   ))}
                 </div>
               </Card>
-              <Card id="selected-client-details" className="selected-client-panel" aria-labelledby="selected-title">
+              <Card
+                id="selected-client-details"
+                className="selected-client-panel"
+                aria-labelledby="selected-title"
+              >
                 <div className="panel-header-row">
                   <h2 className="panel-label" id="selected-title">
                     {selected ? `Selected: ${selected.name}` : 'Select a client'}

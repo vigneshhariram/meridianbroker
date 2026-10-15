@@ -1,0 +1,53 @@
+@layer components {
+  .regional-workspace {
+    min-height: 100vh;
+  }
+  .regional-workspace--executive {
+    background: var(--canvas);
+    color: var(--body);
+    color-scheme: light;
+  }
+  .regional-workspace-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .regional-workspace--executive .brand-name {
+    color: var(--ink);
+  }
+  .regional-workspace--executive .brand-mark {
+    background: var(--navy);
+    color: var(--surface);
+  }
+  .regional-workspace--executive .user-avatar {
+    color: var(--navy-secondary);
+  }
+  .regional-workspace--executive .scope-bar {
+    background: var(--surface-subtle);
+    color: var(--body);
+    border-bottom: 1px solid var(--line);
+  }
+  .regional-workspace-nav a {
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .regional-workspace-nav a[aria-current='page'] {
+    color: var(--ink);
+    background: var(--selected);
+  }
+  .regional-workspace-nav a:hover {
+    color: var(--ink);
+  }
+  @media (max-width: 760px) {
+    .regional-workspace-nav {
+      padding: 8px 12px;
+    }
+  }
+}

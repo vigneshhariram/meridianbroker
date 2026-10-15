@@ -9,6 +9,10 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
+      '/api': {
+        target: apiTarget,
+        changeOrigin: true,
+      },
       '/auth': {
         target: apiTarget,
         changeOrigin: true,

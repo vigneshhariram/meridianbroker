@@ -332,7 +332,7 @@
     cursor: pointer;
   }
   .portfolio-card-select:focus-visible {
-    outline: 2px solid var(--sky);
+    outline: 2px solid var(--focus);
     outline-offset: 4px;
   }
   .portfolio-card-meta {

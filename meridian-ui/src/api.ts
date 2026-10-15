@@ -77,12 +77,6 @@ async function request<T>(
 export const getJson = <T>(path: string, signal?: AbortSignal) =>
   request<T>(path, 'GET', undefined, signal)
 export const postJson = <T>(path: string, body: unknown) => request<T>(path, 'POST', body)
-export const generateBrief = (accountId: string) =>
-  postJson<import('./types').AccountBrief>(
-    `/accounts/${encodeURIComponent(accountId)}/brief/generate`,
-    {}
-  )
-
 export const startBriefGeneration = (accountId: string, force = false) =>
   postJson<import('./types').BriefGenerationJob>(
     `/accounts/${encodeURIComponent(accountId)}/brief/jobs`,

@@ -8,8 +8,8 @@ const SignIn = lazy(() => import('./SignIn').then((module) => ({ default: module
 const ProducerDashboard = lazy(() =>
   import('./ProducerDashboard').then((module) => ({ default: module.ProducerDashboard }))
 )
-const RegionalDashboard = lazy(() =>
-  import('./RegionalDashboard').then((module) => ({ default: module.RegionalDashboard }))
+const RegionalWorkspace = lazy(() =>
+  import('./RegionalWorkspace').then((module) => ({ default: module.RegionalWorkspace }))
 )
 
 export default function App() {
@@ -18,6 +18,16 @@ export default function App() {
   const [openedAccount, setOpenedAccount] = useState('')
   const [notice, setNotice] = useState('')
   const [signingOut, setSigningOut] = useState(false)
+  const [pathname, setPathname] = useState(window.location.pathname)
+
+  useEffect(() => {
+    const sync = () => {
+      setPathname(window.location.pathname)
+      setOpenedAccount('')
+    }
+    window.addEventListener('popstate', sync)
+    return () => window.removeEventListener('popstate', sync)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -82,11 +92,19 @@ export default function App() {
       </main>
     )
   if (!session) return <SignIn onSignIn={signIn} notice={notice} />
+  if (session.user.role !== 'Regional Leader' && /^\/executive-dashboard\/?$/.test(pathname))
+    return (
+      <main className="session-loading">
+        <h1>Access denied</h1>
+        <ErrorState message="Access denied. The Executive Dashboard is available only to Regional Leaders." />
+        <a href="/">Return to your workspace</a>
+      </main>
+    )
   return (
     <>
       {notice && <ErrorState message={notice} />}
       {session.user.role === 'Regional Leader' && !openedAccount ? (
-        <RegionalDashboard
+        <RegionalWorkspace
           user={session.user}
           onSignOut={signOut}
           signingOut={signingOut}

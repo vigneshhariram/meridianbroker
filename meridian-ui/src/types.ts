@@ -150,6 +150,8 @@ export type Contradiction = {
 }
 
 export type BriefTelemetry = {
+  cost_known?: boolean
+  cost_basis?: string
   model: string
   tokens_in: number
   tokens_out: number

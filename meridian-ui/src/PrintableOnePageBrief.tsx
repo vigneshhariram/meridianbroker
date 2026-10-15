@@ -85,7 +85,10 @@ export function PrintableOnePageBrief({
           {telemetry && (
             <div className="print-telemetry-text">
               Model: {telemetry.model} · {telemetry.total_tokens} tokens ·{' '}
-              {(telemetry.latency_ms / 1000).toFixed(1)}s · ${telemetry.cost_usd.toFixed(4)}
+              {(telemetry.latency_ms / 1000).toFixed(1)}s ·{' '}
+              {telemetry.cost_known === false
+                ? 'Cost unavailable'
+                : `Est. $${telemetry.cost_usd.toFixed(4)}`}
             </div>
           )}
         </div>

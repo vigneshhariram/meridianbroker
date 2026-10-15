@@ -16,7 +16,7 @@ import {
 } from './components/ui'
 
 const draftSchema = z.object({
-  title: z.string().trim().min(1, 'Enter a title.').max(250),
+  title: z.string().trim().min(1, 'Enter a title.').max(200),
   body: z
     .string()
     .trim()
@@ -66,7 +66,7 @@ export function BriefActionDraft({
         if (!open) onClose()
       }}
       title="Review suggested action"
-      description="Edit this draft, check the supporting records, then copy it to your normal workflow."
+      description="Edit this draft, check the supporting records, then copy it for manual use."
     >
       <form onSubmit={handleSubmit(copy)} noValidate>
         <FormLabel htmlFor="draft-title">Title</FormLabel>

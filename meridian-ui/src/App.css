@@ -76,12 +76,13 @@
     align-items: center;
     gap: 8px;
     padding: 8px 24px;
-    background: var(--navy);
-    color: var(--surface);
+    background: var(--selected);
+    color: var(--navy);
+    border-bottom: 1px solid var(--line);
     font-size: 12px;
   }
   .scope-bar svg {
-    color: var(--focus);
+    color: var(--action);
   }
   .scope-bar .scope-end {
     margin-left: auto;

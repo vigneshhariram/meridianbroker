@@ -8,20 +8,25 @@
   font-variant-numeric: tabular-nums;
   color: var(--body);
   background: var(--canvas);
-  --navy: #012254;
-  --navy-secondary: #003380;
-  --action: #003380;
-  --focus: #00adef;
-  --sky: #769aca;
-  --selected: #e8f2ff;
-  --ink: #0c0e0f;
-  --body: #252833;
-  --muted: #5f6474;
-  --canvas: #f3f6fa;
+  color-scheme: light;
+  --navy: #001f61;
+  --navy-secondary: #0041cc;
+  --action: #0052ff;
+  --action-hover: #0041cc;
+  --action-active: #003099;
+  --focus: #0052ff;
+  --sky: #6aaae4;
+  --selected: #f0f5ff;
+  --ink: #000b24;
+  --body: #29343d;
+  --muted: #52616b;
+  --canvas: #f9fafb;
   --surface: #ffffff;
-  --surface-subtle: #f8fbff;
-  --line: #e2e8f0;
-  --control-border: #79879b;
+  --surface-subtle: #eef1f5;
+  --surface-cyan: #f2fdfd;
+  --surface-violet: #f5f0ff;
+  --line: #c7d1d9;
+  --control-border: #768ea2;
   --success: #0d652d;
   --success-surface: #ecfdf3;
   --success-border: #abefc6;
@@ -32,9 +37,9 @@
   --critical-surface: #fef3f2;
   --critical-border: #fecdca;
   --glass: rgba(255, 255, 255, 0.88);
-  --overlay: rgba(1, 34, 84, 0.4);
-  --shadow: 0 1px 2px rgba(12, 14, 15, 0.035), 0 3px 9px rgba(1, 34, 84, 0.035);
-  --shadow-hover: 0 5px 18px rgba(1, 34, 84, 0.09);
+  --overlay: rgba(0, 11, 36, 0.4);
+  --shadow: 0 1px 2px rgba(0, 11, 36, 0.035), 0 3px 9px rgba(0, 31, 97, 0.035);
+  --shadow-hover: 0 5px 18px rgba(0, 31, 97, 0.09);
   --shimmer: rgba(255, 255, 255, 0.76);
   --space-1: 4px;
   --space-2: 8px;
@@ -244,8 +249,11 @@
     border-color: var(--action);
   }
   .ui-button-primary:hover {
-    background: var(--navy);
-    border-color: var(--navy);
+    background: var(--action-hover);
+    border-color: var(--action-hover);
+  }
+  .ui-button-primary:active {
+    background: var(--action-active);
   }
   .ui-button-outline {
     background: var(--surface);
@@ -533,8 +541,7 @@
     width: min(560px, 100vw);
     overflow-y: auto;
     padding: 24px;
-    background: var(--glass);
-    backdrop-filter: blur(12px) saturate(160%);
+    background: var(--surface);
     border-left: 1px solid var(--line);
     box-shadow: var(--shadow);
   }
@@ -554,7 +561,7 @@
   .record-fields {
     margin: 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
   .record-fields dt {
@@ -637,6 +644,7 @@
   }
   .table-toolbar {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
     justify-content: space-between;
     padding-bottom: 12px;
@@ -774,6 +782,7 @@
     }
     .record-fields {
       gap: 16px;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 }

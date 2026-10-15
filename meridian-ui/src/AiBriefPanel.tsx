@@ -182,7 +182,11 @@ export function AiBriefPanel({
               <span>{brief.telemetry.model}</span>
               <span>{brief.telemetry.total_tokens.toLocaleString()} tokens</span>
               <span>{(brief.telemetry.latency_ms / 1000).toFixed(1)}s</span>
-              <span>Est. ${brief.telemetry.cost_usd.toFixed(4)}</span>
+              <span>
+                {brief.telemetry.cost_known === false
+                  ? 'Cost unavailable'
+                  : `Est. $${brief.telemetry.cost_usd.toFixed(4)}`}
+              </span>
             </div>
           )}
         </div>
@@ -310,7 +314,14 @@ export function AiBriefPanel({
           </p>
         </Card>
       </div>
-      {citation && <CitationSheet key={`${brief.account.account_id}:${citation}`} brief={brief} reference={citation} onClose={() => setCitation(null)} />}
+      {citation && (
+        <CitationSheet
+          key={`${brief.account.account_id}:${citation}`}
+          brief={brief}
+          reference={citation}
+          onClose={() => setCitation(null)}
+        />
+      )}
       {selectedAction && (
         <BriefActionDraft
           key={`${selectedAction.title}:${selectedAction.description}`}

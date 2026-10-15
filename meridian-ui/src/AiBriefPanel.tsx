@@ -271,12 +271,9 @@ export function AiBriefPanel({
               </ul>
             </div>
           )}
-          <div className="card-list-items">
-            {brief.risks.map((signal) => (
-              <SignalRow signal={signal} key={signal.signal_id} />
-            ))}
-            {!brief.risks.length && <p className="muted">No supported risk flags.</p>}
-          </div>
+          {(!brief.prioritized_risks || brief.prioritized_risks.length === 0) && (
+            <p className="muted">No AI-prioritized risk flags.</p>
+          )}
         </section>
 
         <section className="cockpit-grid-card">
@@ -308,14 +305,9 @@ export function AiBriefPanel({
               </ul>
             </div>
           )}
-          <div className="card-list-items">
-            {brief.opportunities.map((signal) => (
-              <SignalRow signal={signal} key={signal.signal_id} />
-            ))}
-            {!brief.opportunities.length && (
-              <p className="muted">Insufficient accessible evidence for an opportunity.</p>
-            )}
-          </div>
+          {(!brief.opportunity_hypotheses || brief.opportunity_hypotheses.length === 0) && (
+            <p className="muted">No AI opportunity hypotheses.</p>
+          )}
           <p className="card-footer-muted">
             Validate assumptions with the client before recommending coverage.
           </p>

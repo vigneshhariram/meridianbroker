@@ -90,7 +90,6 @@ def run(url: str, screenshot: str | None):
         # Verify Overview tab operational components
         expect(page.locator(".snapshot-grid")).to_be_visible()
         expect(page.locator(".timeline-card-panel")).to_be_visible()
-        expect(page.get_by_role("button", name="Export AI Brief (PDF)", exact=True)).to_be_visible()
         expect(page.get_by_role("button", name="Print View", exact=True)).to_be_visible()
         expect(page.locator("#printable-ai-brief")).to_have_count(1)
 
@@ -105,10 +104,6 @@ def run(url: str, screenshot: str | None):
         expect(page.locator(".timeline-card-panel")).to_be_visible()
         expect(page.locator(".agenda-panel")).not_to_be_visible()
 
-        # Operational quick-action shortcut to AI Brief
-        page.get_by_role("button", name="Open AI Meeting Brief →").click()
-        expect(page.locator(".agenda-panel")).to_be_visible()
-        expect(page.locator(".timeline-card-panel")).not_to_be_visible()
 
         # Operational quick-action shortcut to Policies
         page.get_by_role("button", name="Overview", exact=True).click()

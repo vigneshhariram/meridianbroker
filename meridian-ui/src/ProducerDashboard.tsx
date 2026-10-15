@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  FileText,
   Printer,
   Sparkles,
 } from 'lucide-react'
@@ -199,14 +198,6 @@ export function ProducerDashboard({
                       ? 'Date not set'
                       : `${brief.days_to_renewal} days`}
                   </span>
-                  <button
-                    className="button button-primary export-button export-ai-brief-button"
-                    onClick={handleExportAiBrief}
-                    title="Export publication-ready 1-page executive brief PDF"
-                  >
-                    <FileText size={14} />
-                    Export AI Brief (PDF)
-                  </button>
                   <button
                     className="button button-outline print-view-button"
                     onClick={handlePrintView}

@@ -34,7 +34,7 @@
 
 .signin-brand-name {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 22px;
+  font-size: 26.4px;
   font-weight: 700;
   letter-spacing: -0.2px;
   color: #ffffff;
@@ -42,7 +42,7 @@
 }
 
 .signin-brand-motto {
-  font-size: 13px;
+  font-size: 15.6px;
   color: #94a9c4;
   margin: 4px 0 0 0;
   letter-spacing: 0.01em;
@@ -55,7 +55,7 @@
 
 .signin-hero-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 40px;
+  font-size: 48px;
   line-height: 1.2;
   font-weight: 700;
   color: #ffffff;
@@ -64,7 +64,7 @@
 }
 
 .signin-hero-subtitle {
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.55;
   color: #b8c9dd;
   max-width: 480px;
@@ -89,7 +89,7 @@
   border-radius: 5px;
   background: #183354;
   color: #8cb2e8;
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -99,7 +99,7 @@
 }
 
 .feature-text {
-  font-size: 13.5px;
+  font-size: 16.2px;
   line-height: 1.5;
   color: #cbd7e6;
 }
@@ -110,7 +110,7 @@
 }
 
 .signin-left-footer {
-  font-size: 12px;
+  font-size: 14.4px;
   color: #697f9c;
   margin-top: 30px;
 }
@@ -140,14 +140,14 @@
 }
 
 .signin-card-title {
-  font-size: 26px;
+  font-size: 31.2px;
   font-weight: 700;
   color: #102946;
   margin: 0 0 4px 0;
 }
 
 .signin-card-subtitle {
-  font-size: 13px;
+  font-size: 15.6px;
   color: #64748b;
   margin: 0;
 }
@@ -165,7 +165,7 @@
 }
 
 .form-label {
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 600;
   color: #334155;
 }
@@ -181,7 +181,7 @@
   height: 40px;
   padding: 0 14px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 600;
   border: 1px solid #d8e0ea;
   background: #ffffff;
@@ -204,7 +204,7 @@
   background: #f1f6fd;
   border-radius: 6px;
   padding: 12px 14px;
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.5;
   color: #2c4669;
   border-left: 3px solid #2363bd;
@@ -230,7 +230,7 @@
 .signin-notice {
   padding: 10px 12px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 15.6px;
   margin: 0;
 }
 .signin-error {
@@ -248,7 +248,7 @@
 }
 .demo-accounts {
   margin-top: 24px;
-  font-size: 12px;
+  font-size: 14.4px;
   color: #64748b;
 }
 .demo-accounts summary {
@@ -287,7 +287,7 @@
   padding: 0 12px;
   border-radius: 6px;
   border: 1px solid #d0d9e4;
-  font-size: 13px;
+  font-size: 15.6px;
   color: #1e293b;
   background: #ffffff;
   transition:
@@ -305,7 +305,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 14.4px;
   color: #64748b;
   margin: 2px 0 4px 0;
 }
@@ -326,7 +326,7 @@
   background: none;
   border: none;
   padding: 0;
-  font-size: 12px;
+  font-size: 14.4px;
   color: #2363bd;
   cursor: pointer;
   text-decoration: none;
@@ -341,7 +341,7 @@
   border-radius: 6px;
   background: #1e5bb6;
   color: #ffffff;
-  font-size: 13.5px;
+  font-size: 16.2px;
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -366,7 +366,7 @@
 }
 
 .divider-text {
-  font-size: 11px;
+  font-size: 13.2px;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -378,7 +378,7 @@
   background: #ffffff;
   border: 1px solid #1e5bb6;
   color: #1e5bb6;
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 140ms ease;
@@ -390,7 +390,7 @@
 
 .signin-card-footer {
   margin-top: 24px;
-  font-size: 11px;
+  font-size: 13.2px;
   line-height: 1.5;
   color: #64748b;
   text-align: center;
@@ -405,6 +405,7 @@
     padding: 36px 24px;
   }
   .signin-hero-title {
-    font-size: 28px;
+    font-size: 33.6px;
   }
 }
+

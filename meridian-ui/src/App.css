@@ -26,7 +26,7 @@
 
 .brand-name {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 17px;
+  font-size: 20.4px;
   font-weight: 700;
   letter-spacing: -0.2px;
 }
@@ -39,7 +39,7 @@
 
 .brand-subtitle {
   color: #bdcadd;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .global-search {
@@ -62,7 +62,7 @@
   outline: 0;
   color: #fff;
   background: transparent;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .global-search input::placeholder {
@@ -77,7 +77,7 @@
   border: 0;
   color: #e1e8f2;
   background: transparent;
-  font-size: 11px;
+  font-size: 13.2px;
   white-space: nowrap;
 }
 
@@ -112,7 +112,7 @@
 .panel-label {
   margin: 0;
   color: #56657a;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.095em;
   line-height: 1.35;
@@ -137,7 +137,7 @@
   background: transparent;
   color: #5e6b7d;
   text-align: left;
-  font-size: 11px;
+  font-size: 13.2px;
   cursor: pointer;
   transition:
     background 140ms ease,
@@ -198,7 +198,7 @@
 .account-option-name {
   overflow: hidden;
   color: #283950;
-  font-size: 10.5px;
+  font-size: 12.6px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -207,7 +207,7 @@
 .account-option-meta {
   margin-top: 5px;
   color: #8994a3;
-  font-size: 9px;
+  font-size: 10.8px;
 }
 
 .risk-dot {
@@ -236,7 +236,7 @@
   border-radius: 999px;
   color: #68788d;
   background: #eef2f6;
-  font-size: 8px;
+  font-size: 9.6px;
   font-weight: 600;
   text-transform: capitalize;
   white-space: nowrap;
@@ -261,7 +261,7 @@
   padding: 3px 7px;
   color: #67778a;
   background: #f0f3f7;
-  font-size: 9px;
+  font-size: 10.8px;
 }
 
 .account-heading {
@@ -272,7 +272,7 @@
 .eyebrow {
   margin: 0 0 3px;
   color: #758398;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
   letter-spacing: 0.035em;
   text-transform: uppercase;
@@ -282,7 +282,7 @@
   margin: 0;
   color: #192a40;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(21px, 2.2vw, 27px);
+  font-size: clamp(25.2px, 2.2vw, 32.4px);
   font-weight: 700;
   letter-spacing: -0.5px;
   line-height: 1.2;
@@ -291,7 +291,7 @@
 .account-subtitle {
   margin: 5px 0 0;
   color: #718096;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .heading-badges {
@@ -310,7 +310,7 @@
   border-radius: 999px;
   color: #a34842;
   background: #fbe9e7;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -339,7 +339,7 @@
   min-height: 34px;
   padding: 7px 10px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -368,13 +368,13 @@
 .updated-label,
 .source-note {
   color: #8995a5;
-  font-size: 9px;
+  font-size: 10.8px;
 }
 
 .summary-text {
   margin: 9px 0 0;
   color: #526176;
-  font-size: 11px;
+  font-size: 13.2px;
   line-height: 1.65;
 }
 
@@ -403,8 +403,9 @@
 
 .snapshot-label {
   color: #738095;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
+  min-height: 36px;
 }
 
 .snapshot-bottom {
@@ -417,13 +418,13 @@
 
 .snapshot-bottom strong {
   color: #24354b;
-  font-size: 22px;
+  font-size: 26.4px;
   line-height: 1;
 }
 
 .snapshot-bottom span {
   color: #8994a3;
-  font-size: 8px;
+  font-size: 9.6px;
   text-align: right;
 }
 
@@ -493,7 +494,7 @@
 .signal-copy strong {
   display: block;
   color: #3c4b60;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -501,7 +502,7 @@
 .signal-copy p {
   margin: 3px 0 0;
   color: #818d9c;
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.45;
 }
 
@@ -512,7 +513,7 @@
   border-radius: 4px;
   color: #4d6d94;
   background: #edf3fb;
-  font-size: 8px;
+  font-size: 9.6px;
 }
 
 .confidence-tag {
@@ -521,7 +522,7 @@
   border-radius: 999px;
   color: #8a651f;
   background: #faf0d9;
-  font-size: 8px;
+  font-size: 9.6px;
   white-space: nowrap;
 }
 
@@ -588,7 +589,7 @@
   flex: 1;
   overflow: hidden;
   color: #536176;
-  font-size: 9px;
+  font-size: 10.8px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -596,7 +597,7 @@
 .commitment-status {
   flex: 0 0 auto;
   color: #8792a0;
-  font-size: 8px;
+  font-size: 9.6px;
   text-transform: capitalize;
 }
 
@@ -613,7 +614,7 @@
 .row-date {
   flex: 0 0 auto;
   color: #7f8b9b;
-  font-size: 8px;
+  font-size: 9.6px;
   white-space: nowrap;
 }
 
@@ -639,7 +640,7 @@
   border-radius: 6px;
   color: #637286;
   background: transparent;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -667,7 +668,7 @@
   border-radius: 999px;
   color: #6d7d91;
   background: #edf1f6;
-  font-size: 8px;
+  font-size: 9.6px;
   text-align: center;
 }
 
@@ -693,7 +694,7 @@
   margin: 1px 0 0;
   color: #203148;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 21px;
+  font-size: 25.2px;
 }
 
 .details-list {
@@ -726,14 +727,14 @@
 
 .record-kicker {
   color: #708097;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
 }
 
 .detail-record-heading h3 {
   margin: 4px 0 0;
   color: #35465d;
-  font-size: 12px;
+  font-size: 14.4px;
   font-weight: 600;
   line-height: 1.45;
 }
@@ -744,7 +745,7 @@
   border-radius: 999px;
   color: #94651f;
   background: #fbf0d9;
-  font-size: 8px;
+  font-size: 9.6px;
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -785,7 +786,7 @@
 
 .detail-field span {
   color: #8994a3;
-  font-size: 8px;
+  font-size: 9.6px;
   text-transform: uppercase;
   letter-spacing: 0.045em;
 }
@@ -793,7 +794,7 @@
 .detail-field strong {
   overflow: hidden;
   color: #4d5c70;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -807,7 +808,7 @@
   justify-content: center;
   gap: 9px;
   color: #8491a1;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .details-error {
@@ -817,7 +818,7 @@
   border-radius: 7px;
   color: #953f39;
   background: #fff2f0;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .evidence-panel {
@@ -850,7 +851,7 @@
   border-radius: 4px;
   color: #526d91;
   background: #eef3fa;
-  font-size: 8px;
+  font-size: 9.6px;
   font-weight: 600;
 }
 
@@ -863,7 +864,7 @@
 .source-title {
   margin: 4px 0;
   color: #3f4d61;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -871,14 +872,14 @@
 .source-copy {
   margin: 5px 0 0;
   color: #69778a;
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.5;
 }
 
 .source-meta {
   margin: 6px 0 0;
   color: #8b96a4;
-  font-size: 8px;
+  font-size: 9.6px;
 }
 
 .evidence-summary {
@@ -888,7 +889,7 @@
 .coverage-number {
   margin-top: 13px;
   color: #203c5d;
-  font-size: 29px;
+  font-size: 34.8px;
   font-weight: 700;
   line-height: 1;
 }
@@ -898,7 +899,7 @@
 }
 
 .small {
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.55;
 }
 
@@ -913,7 +914,7 @@
   grid-template-columns: 1fr auto;
   gap: 7px;
   color: #788597;
-  font-size: 9px;
+  font-size: 10.8px;
 }
 
 .coverage-breakdown strong {
@@ -943,7 +944,7 @@
 .empty-copy {
   margin: 12px 0 5px;
   color: #8792a0;
-  font-size: 9px;
+  font-size: 10.8px;
   line-height: 1.5;
 }
 
@@ -953,7 +954,7 @@
   border-radius: 8px;
   color: #953f39;
   background: #fff2f0;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .loading-panel {
@@ -963,7 +964,7 @@
   justify-content: center;
   gap: 10px;
   color: #75849a;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .loader {
@@ -989,13 +990,13 @@
   margin: 12px 0 5px;
   color: #344a65;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 22px;
+  font-size: 26.4px;
 }
 
 .empty-panel p {
   margin: 0;
   color: #8290a0;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 @keyframes spin {
@@ -1037,7 +1038,7 @@
   }
 
   .brand-name {
-    font-size: 14px;
+    font-size: 16.8px;
   }
 
   .brand-divider,
@@ -1132,7 +1133,7 @@
 
   .detail-tab {
     padding-inline: 9px;
-    font-size: 9px;
+    font-size: 10.8px;
   }
 
   .details-panel {
@@ -1146,7 +1147,7 @@
 
 
 .brand-name {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .brand-subtitle,
@@ -1159,7 +1160,7 @@
 .details-loading,
 .details-error,
 .empty-panel p {
-  font-size: 14px;
+  font-size: 16.8px;
 }
 
 .panel-label,
@@ -1183,7 +1184,7 @@
 .small,
 .details-heading h2,
 .detail-record-heading h3 {
-  font-size: 12px;
+  font-size: 14.4px;
 }
 
 .eyebrow,
@@ -1201,7 +1202,7 @@
 .source-meta,
 .count-pill,
 .mini-risk {
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .button,
@@ -1212,27 +1213,27 @@
 }
 
 .account-heading h1 {
-  font-size: clamp(25px, 2.6vw, 31px);
+  font-size: clamp(30px, 2.6vw, 37.2px);
 }
 
 .snapshot-bottom strong {
-  font-size: 25px;
+  font-size: 30px;
 }
 
 .details-heading h2 {
-  font-size: 25px;
+  font-size: 30px;
 }
 
 .detail-record-heading h3 {
-  font-size: 14px;
+  font-size: 16.8px;
 }
 
 .coverage-number {
-  font-size: 32px;
+  font-size: 38.4px;
 }
 
 .empty-panel h1 {
-  font-size: 26px;
+  font-size: 31.2px;
 }
 
 .detail-tab {
@@ -1254,7 +1255,7 @@
 
 @media (max-width: 760px) {
   .brand-name {
-    font-size: 17px;
+    font-size: 20.4px;
   }
 
   .role-current {
@@ -1277,7 +1278,7 @@
   align-items: center;
   gap: 8px;
   color: #f7f9fd;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -1296,7 +1297,7 @@
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #e2eaf5;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 500;
   border-radius: 5px;
   padding: 4px 9px;
@@ -1320,13 +1321,13 @@
 
 .account-option-premium {
   color: #79889b;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .days-pill {
   padding: 3px 8px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1348,7 +1349,7 @@
 
 .client-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 24px;
+  font-size: 28.8px;
   font-weight: 700;
   color: #17273d;
   margin: 0;
@@ -1356,7 +1357,7 @@
 
 .client-subtitle {
   color: #637388;
-  font-size: 11px;
+  font-size: 13.2px;
   margin: 4px 0 0;
 }
 
@@ -1374,7 +1375,7 @@
   border-radius: 6px;
   color: #a53b34;
   background: #fde8e7;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
 }
 
@@ -1398,14 +1399,14 @@
   border-radius: 999px;
   color: #1b6d43;
   background: #e4f4ec;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .summary-body {
   margin: 8px 0 0;
   color: #3b495c;
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.6;
 }
 
@@ -1427,7 +1428,7 @@
 }
 
 .card-subhead {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
   color: #3d4f66;
   letter-spacing: 0.3px;
@@ -1446,7 +1447,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #334358;
 }
 
@@ -1461,14 +1462,14 @@
   border-radius: 4px;
   color: #27568f;
   background: #e7effa;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 500;
 }
 
 .score-badge {
   padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1490,7 +1491,7 @@
 
 .card-footer-muted {
   margin: 10px 0 0;
-  font-size: 10px;
+  font-size: 12px;
   color: #8391a3;
   font-style: italic;
 }
@@ -1499,7 +1500,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #334358;
   padding: 3px 0;
 }
@@ -1509,13 +1510,13 @@
   background: #fde8e7;
   padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .date-tag {
   color: #69788d;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .agenda-numbered-list {
@@ -1524,7 +1525,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #334358;
 }
 
@@ -1543,12 +1544,12 @@
 .conflict-title {
   color: #7b4f0e;
   font-weight: 700;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 
 .conflict-sub {
   color: #9c6c22;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .evidence-sources-list {
@@ -1572,7 +1573,7 @@
 }
 
 .card-headline {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
   color: #2c3c52;
 }
@@ -1580,7 +1581,7 @@
 .evidence-confidence-pill {
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 600;
 }
 
@@ -1597,13 +1598,13 @@
 .card-meta {
   margin: 3px 0 0;
   color: #728092;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .card-id {
   margin: 2px 0 0;
   color: #4b6280;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -1621,7 +1622,7 @@
 }
 
 .portfolio-heading h2 {
-  font-size: 16px;
+  font-size: 19.2px;
   font-weight: 700;
   color: #17273d;
   margin: 0;
@@ -1634,10 +1635,10 @@
   padding: 9px;
   border: 1px solid #d0d9e7;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 .workspace-scope {
-  font-size: 11px;
+  font-size: 13.2px;
   color: #61728d;
   line-height: 1.6;
   margin: 0 5px;
@@ -1647,7 +1648,7 @@
   border-radius: 6px;
   background: #eaf3ff;
   color: #25456b;
-  font-size: 13px;
+  font-size: 15.6px;
 }
 .session-loading {
   display: flex;
@@ -1661,20 +1662,20 @@
   padding-bottom: 9px;
 }
 .live-signal p {
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.5;
   color: #536581;
   margin: 5px 0;
 }
 .live-signal small {
   color: #7a5d26;
-  font-size: 11px;
+  font-size: 13.2px;
 }
 .milestone-line {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
+  font-size: 14.4px;
 }
 .milestone-line span {
   color: #536581;
@@ -1685,7 +1686,7 @@
   margin-bottom: 0;
   display: grid;
   gap: 12px;
-  font-size: 13px;
+  font-size: 15.6px;
 }
 .relationship-timeline li time {
   display: inline-block;
@@ -1693,7 +1694,7 @@
   color: #536581;
 }
 .assistant-label {
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.5;
 }
 .evidence-sources-list {
@@ -1712,14 +1713,14 @@
 }
 .signal-math-details {
   margin-top: 6px;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #64748b;
 }
 .signal-math-details summary {
   cursor: pointer;
   user-select: none;
   color: #3b82f6;
-  font-size: 10px;
+  font-size: 12px;
   text-decoration: underline;
 }
 .signal-math-details pre {
@@ -1728,7 +1729,7 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: monospace;
   overflow-x: auto;
 }
@@ -1742,7 +1743,7 @@
   background: none;
   border: none;
   color: #2563eb;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   padding: 4px 0 0;
@@ -1784,21 +1785,21 @@
   gap: 5px;
   background: #1e3a8a;
   color: #ffffff;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 999px;
 }
 
 .ai-callout-status {
-  font-size: 11px;
+  font-size: 13.2px;
   color: #334155;
   font-weight: 500;
 }
 
 .telemetry-pill {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
+  font-size: 12px;
   background: #e2e8f0;
   color: #475569;
   padding: 2px 7px;
@@ -1806,7 +1807,7 @@
 }
 
 .ai-jump-btn {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
   color: #1e3a8a;
   border-color: #93c5fd;
@@ -1839,18 +1840,18 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  font-size: 11.5px;
+  font-size: 13.8px;
 }
 
 .timeline-date {
-  font-size: 10.5px;
+  font-size: 12.6px;
   color: #64748b;
   font-weight: 600;
   min-width: 80px;
 }
 
 .timeline-type-badge {
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
@@ -1893,7 +1894,7 @@
 
 .timeline-ref-id {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 9.5px;
+  font-size: 11.4px;
   color: #64748b;
   background: #e2e8f0;
   padding: 1px 5px;
@@ -2301,7 +2302,7 @@
   }
 
   body:not(.printing-ai-brief) .client-title {
-    font-size: 22px;
+    font-size: 26.4px;
   }
 
   body:not(.printing-ai-brief) .cockpit-2x2-grid {
@@ -2319,7 +2320,7 @@
   border: none;
   border-radius: 6px;
   padding: 5px 12px;
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2361,7 +2362,7 @@
   gap: 5px;
   background: #f1f5f9;
   color: #334155;
-  font-size: 10.5px;
+  font-size: 12.6px;
   font-weight: 500;
   padding: 3px 8px;
   border-radius: 4px;
@@ -2370,7 +2371,7 @@
 }
 
 .telemetry-version {
-  font-size: 11px;
+  font-size: 13.2px;
   font-weight: 600;
   color: #64748b;
 }
@@ -2386,13 +2387,13 @@
   padding: 12px 14px;
   margin: 10px 0;
   color: #92400e;
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.45;
 }
 
 .completeness-alert-box strong {
   display: block;
-  font-size: 12.5px;
+  font-size: 15px;
   font-weight: 700;
   color: #78350f;
   margin-bottom: 2px;
@@ -2424,14 +2425,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 15.6px;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
 
 .card-badge {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   background: #e2e8f0;
   color: #475569;
@@ -2452,7 +2453,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-size: 12px;
+  font-size: 14.4px;
   color: #334155;
   line-height: 1.45;
   background: #f8fafc;
@@ -2478,7 +2479,7 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 12px;
+  font-size: 14.4px;
   line-height: 1.45;
   padding: 8px 10px;
   border-radius: 6px;
@@ -2496,7 +2497,7 @@
 }
 
 .point-tag {
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   text-transform: uppercase;
   padding: 2px 5px;
@@ -2547,7 +2548,7 @@
 }
 
 .action-type-tag {
-  font-size: 9.5px;
+  font-size: 11.4px;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
@@ -2570,14 +2571,14 @@
 }
 
 .action-title {
-  font-size: 11.5px;
+  font-size: 13.8px;
   font-weight: 700;
   color: #0f172a;
 }
 
 .action-description {
   margin: 0;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #475569;
   line-height: 1.4;
 }
@@ -2596,7 +2597,7 @@
 }
 
 .citations-label {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   color: #64748b;
@@ -2611,7 +2612,7 @@
 
 .citation-chip {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e40af;
   background: #dbeafe;
@@ -2651,7 +2652,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10.5px;
+  font-size: 12.6px;
   font-weight: 700;
   color: #1e3a8a;
   margin-bottom: 6px;
@@ -2670,7 +2671,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  font-size: 11px;
+  font-size: 13.2px;
   color: #334155;
   line-height: 1.4;
 }
@@ -2688,12 +2689,12 @@
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  font-size: 11px;
+  font-size: 13.2px;
   line-height: 1.4;
 }
 
 .opp-pill {
-  font-size: 9px;
+  font-size: 10.8px;
   font-weight: 700;
   text-transform: uppercase;
   padding: 1px 5px;
@@ -2716,4 +2717,5 @@
   flex: 1;
   color: #334155;
 }
+
 

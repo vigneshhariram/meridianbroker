@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import type { AccountBrief, DetailTab } from './types'
 import { formatDate, formatMoney } from './format'
+import { SignalRow } from './AiBriefPanel'
 
 function formatEventType(type: string): string {
   switch (type) {
@@ -136,14 +137,6 @@ export function ClientOverviewPanel({
               </span>
             )}
           </div>
-          <button
-            type="button"
-            className="button button-outline ai-jump-btn"
-            onClick={() => onSelectTab('ai-brief')}
-          >
-            <Sparkles size={13} />
-            Open AI Meeting Brief →
-          </button>
         </div>
 
         {regenerateError && (
@@ -269,7 +262,38 @@ export function ClientOverviewPanel({
         </section>
       </div>
 
-      {/* 5. Cross-System Contradictions (if any) */}
+      {/* 5. Actual risk & opportunity signals (factual, DB-backed) */}
+      <div className="cockpit-2x2-grid" style={{ marginTop: '12px' }}>
+        <section className="cockpit-grid-card">
+          <div className="card-subhead-row">
+            <h2 className="card-subhead">Risk flags</h2>
+            <span className="card-badge">{brief.risks.length} factual</span>
+          </div>
+          <div className="card-list-items">
+            {brief.risks.map((signal) => (
+              <SignalRow signal={signal} key={signal.signal_id} />
+            ))}
+            {!brief.risks.length && <p className="muted">No supported risk flags.</p>}
+          </div>
+        </section>
+        <section className="cockpit-grid-card">
+          <div className="card-subhead-row">
+            <h2 className="card-subhead">Opportunity signals (hypotheses)</h2>
+            <span className="card-badge">{brief.opportunities.length} factual</span>
+          </div>
+          <div className="card-list-items">
+            {brief.opportunities.map((signal) => (
+              <SignalRow signal={signal} key={signal.signal_id} />
+            ))}
+            {!brief.opportunities.length && (
+              <p className="muted">Insufficient accessible evidence for an opportunity.</p>
+            )}
+          </div>
+          <p className="card-footer-muted">Validate assumptions with the client before recommending coverage.</p>
+        </section>
+      </div>
+
+      {/* 6. Cross-System Contradictions (if any) */}
       {brief.contradictions && brief.contradictions.length > 0 && (
         <section className="panel contradictions-panel" style={{ marginTop: '12px' }}>
           <div className="panel-header-row">

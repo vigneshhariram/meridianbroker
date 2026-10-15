@@ -1,0 +1,48 @@
+ï»¿requirement_id,architecture_component,code_reference,tests,demo_evidence,acceptance_source
+
+FR-01,Auth/session boundary,auth.py;App.tsx;SignIn.tsx,T01;T02,0:00 sign in,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-02,Account/resource authorization,access.py;intelligence.py,T03;T04;T13;T17,6:25 restricted access,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-03,Relational client hub,SQL seed;intelligence.py;AccountDetailsPanel.tsx,T06,1:30 source cards,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-04,Scoped regional portfolio,portfolio.py;RegionalDashboard.tsx,T05;T30,0:40 priority/selection,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-05,Integrated brief agent,agent.py;generation.py;AiBriefPanel.tsx,T07;T20,1:30 generation,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-06,Evidence and canonical records,intelligence.py;AiBriefPanel.tsx;RecordSheet.tsx,T06;T16;T18,2:30 citation/date,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-07,Completeness validator,agent.py;test_agent_and_scenarios.py,T08,3:20 claim completeness,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-08,Runtime conflict derivation,intelligence.py;agent.py,T09,2:30 dates,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-09,Evidence/hypothesis governance,intelligence.py;AiBriefPanel.tsx,T10,4:10 opportunity,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-10,Scoped background workflow,generation.py;useBriefGeneration.ts;BriefStatus.tsx,T11;T12;T13;T14;T17,1:30 progress/fallback,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-11,Selected-client source retrieval (backend API only; Producer controls removed),workflows.py;retired Producer UI,T22;T23,4:55 question,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-12,Human action decision (backend API only; Producer controls removed),workflows.py;BriefActionDraft.tsx;retired Producer UI,T24;T25,4:55 proposal/review,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-13,User correction/quality (backend API only; Producer controls removed),workflows.py;retired Producer UI,T26,5:45 feedback,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-14,Audit/economics,agent.py;generation.py;main.py audit,T27,7:10 usage,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-15,Dynamic relational scenario,intelligence.py;SQL source records,T15,7:10 injection,docs/use-case-extracted.md pages3-6;requirements.md
+
+FR-16,Leader fixture route,executive_dashboard.py;ExecutiveDashboard.tsx;App.tsx,T21,optional fixture distinction,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-01,Privacy/human control,access.py;auth.py;action workflow,T03;T04;T24;T25,6:25 privacy,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-02,Accessible compact UI,components/ui.tsx;theme CSS,T18;T19;T31,all screens,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-03,Bounded provider I/O,agent.py;api.ts,T28,1:30 fallback,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-04,Bounded local job pool,generation.py,T11;T14;T28,1:30 pending work,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-05,Source scoped freshness,generation.py;intelligence.py;useBriefGeneration.ts,T13;T29;T30,7:10 source change,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-06,Typed maintainable code,package.json;pyproject.toml;models.py,Build/lint gates historical,architecture slide,docs/use-case-extracted.md pages3-6;requirements.md
+
+NFR-07,Measurable usage,audit_log;security_events;agent telemetry,T27;T31,7:10 economics,docs/use-case-extracted.md pages3-6;requirements.md
+

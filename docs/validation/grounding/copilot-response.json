@@ -1,0 +1,54 @@
+{
+  "answer": "Current accessible source records (human review required):\n\nACT04 [ACT04]: activity id: ACT04; user id: U1; type: email; activity date: 2026-10-02; notes: Sent update on theft claim and pop-up location request; source system: Salesforce CRM\n\nCLM-66120 [C05]: claim id: C05; policy id: P06; claim number: CLM-66120; status: open; loss date: 2026-08-30; reserve amount: 58000; severity: medium; summary: Storefront break-in theft; source system: Guidewire ClaimCenter; updated at: 2026-10-02\n\nE05 [E05]: endorsement id: E05; policy id: P06; status: pending; description: Add pop-up store location; requested at: 2026-10-01; source system: Guidewire PolicyCenter\n\nThese records do not establish facts beyond their contents. Coverage suggestions require client validation and human approval.",
+  "evidence_citations": [
+    "ACT04",
+    "C05",
+    "E05"
+  ],
+  "mode": "source_based",
+  "as_of_date": "2026-10-08",
+  "citations": [
+    {
+      "source_id": "ACT04",
+      "source_table": "activities",
+      "account_id": "A03",
+      "title": "ACT04",
+      "excerpt": "activity id: ACT04; user id: U1; type: email; activity date: 2026-10-02; notes: Sent update on theft claim and pop-up location request; source system: Salesforce CRM",
+      "content_hash": "42834d6011f8bd58e1fddb6b6f6e700cdf79c62aafd49f0a62c65710da531ec5"
+    },
+    {
+      "source_id": "C05",
+      "source_table": "claims",
+      "account_id": "A03",
+      "title": "CLM-66120",
+      "excerpt": "claim id: C05; policy id: P06; claim number: CLM-66120; status: open; loss date: 2026-08-30; reserve amount: 58000; severity: medium; summary: Storefront break-in theft; source system: Guidewire ClaimCenter; updated at: 2026-10-02",
+      "content_hash": "d0b3adba8bda44d17274ed16dabb2d6515bafce9e704393f427f891402cf62f3"
+    },
+    {
+      "source_id": "E05",
+      "source_table": "endorsements",
+      "account_id": "A03",
+      "title": "E05",
+      "excerpt": "endorsement id: E05; policy id: P06; status: pending; description: Add pop-up store location; requested at: 2026-10-01; source system: Guidewire PolicyCenter",
+      "content_hash": "eb4473441bd06e25d55919b098e8a0d920e5e00a100728c1317e729e2f9ca61d"
+    }
+  ],
+  "retrieval": {
+    "method": "sqlite_fts5",
+    "indexed_records": 9,
+    "retrieved_records": 3,
+    "snapshot_hash": "919f12c17b85e01fc9bc89a41ce4e9ae5937f7935ac3085445367f214f4ec032",
+    "scope": "selected_account"
+  },
+  "telemetry": {
+    "model": "source-based",
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "total_tokens": 0,
+    "latency_ms": 0,
+    "cost_usd": 0.0,
+    "fallback_reason": null,
+    "cost_known": true,
+    "cost_basis": "no_remote_usage"
+  }
+}

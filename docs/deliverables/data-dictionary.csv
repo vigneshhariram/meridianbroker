@@ -1,0 +1,235 @@
+﻿table,table_purpose,column,meaning,sql_type,primary_key,nullable,reference,constraints,ddl_source
+users,Fictional signed-in personas and ownership,user_id,Stable user identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+users,Fictional signed-in personas and ownership,name,Name for this users record,TEXT,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+users,Fictional signed-in personas and ownership,email,Email for this users record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+users,Fictional signed-in personas and ownership,persona,Server-assigned producer/regional_leader context,TEXT,,no,,"NOT NULL CHECK (persona IN ('producer','regional_leader'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+users,Fictional signed-in personas and ownership,region,Region for this users record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,account_id,Stable account identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,name,Name for this accounts record,TEXT,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,industry,Industry for this accounts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,city,City for this accounts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,state,State for this accounts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,region,Region for this accounts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,segment,Segment for this accounts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,owner_user_id,Stable owner user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,annual_premium,Synthetic annual account premium in USD; account counted once in portfolio totals,"NUMERIC(12,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,client_since,Client since for this accounts record,INTEGER,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,risk_level,Source/cached risk tier; displayed runtime tier is recomputed,TEXT,,yes,,"CHECK (risk_level IN ('high','medium','low'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,restricted_flag,Source account restriction indicator,BOOLEAN,,no,,NOT NULL DEFAULT 0,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+accounts,Client identity and brokerage relationship,updated_at,Updated at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,contact_id,Stable contact identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,name,Name for this contacts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,role,Role for this contacts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,email,Email for this contacts record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contacts,Client contact details,is_primary,Is primary for this contacts record,BOOLEAN,,yes,,DEFAULT 0,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,policy_id,Stable policy identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,policy_number,Human-readable policy number alias; resolve to canonical record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,carrier,Carrier for this policies record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,line_of_business,Line of business for this policies record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,premium,Synthetic policy premium in USD,"NUMERIC(12,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,effective_date,Effective date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,renewal_date,Renewal date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,crm_renewal_date,Crm renewal date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,crm_updated_at,Crm updated at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,DEFAULT 'active',meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+policies,Synthetic policy and renewal source records,updated_at,Updated at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",claim_id,Stable claim identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",policy_id,Stable policy identifier or relationship reference,TEXT,,no,policies(policy_id),NOT NULL REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",claim_number,Human-readable claim number alias; resolve to canonical record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",status,Record/workflow state constrained by service or DDL,TEXT,,no,,"NOT NULL CHECK (status IN ('open','closed'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",loss_date,Loss date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",reserve_amount,Recorded claim reserve in USD; not a paid-loss prediction,"NUMERIC(12,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",severity,"Impact tier, separate from evidence confidence",TEXT,,yes,,"CHECK (severity IN ('high','medium','low'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",summary,Summary for this claims record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+claims,"Claim status, materiality and reserves",updated_at,Updated at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,activity_id,Stable activity identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,user_id,Stable user identifier or relationship reference,TEXT,,yes,users(user_id),REFERENCES users(user_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,type,Type for this activities record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,activity_date,Activity date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,notes,Notes for this activities record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+activities,Dated relationship interactions,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,case_id,Stable case identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,policy_id,Stable policy identifier or relationship reference,TEXT,,yes,policies(policy_id),REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,case_number,Human-readable case number alias; resolve to canonical record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('open','closed'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,issue,Issue for this service cases record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,category,Category for this service cases record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,opened_at,Opened at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,resolved_at,Resolved at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+service_cases,Open/resolved service issues,updated_at,Updated at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,doc_id,Stable doc identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,type,Type for this documents record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,title,Title for this documents record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,content_text,Content text for this documents record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,uploaded_at,Uploaded at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+documents,Permitted source text and provenance,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,invoice_id,Stable invoice identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,policy_id,Stable policy identifier or relationship reference,TEXT,,no,policies(policy_id),NOT NULL REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,amount,Amount for this billing record,"NUMERIC(12,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,due_date,Due date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('paid','due','overdue'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+billing,Synthetic invoices and payment state,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,endorsement_id,Stable endorsement identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,policy_id,Stable policy identifier or relationship reference,TEXT,,no,policies(policy_id),NOT NULL REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('pending','completed'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,description,Source or proposal description,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,requested_at,Requested at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+endorsements,Policy-change requests,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,event_id,Stable event identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,event_type,Event type for this timeline events record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,event_date,Event date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,title,Title for this timeline events record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,ref_table,Ref table for this timeline events record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+timeline_events,Traceable relationship chronology,ref_id,Stable ref identifier or relationship reference,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+renewal_milestones,Policy renewal due dates and steps,milestone_id,Stable milestone identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+renewal_milestones,Policy renewal due dates and steps,policy_id,Stable policy identifier or relationship reference,TEXT,,no,policies(policy_id),NOT NULL REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+renewal_milestones,Policy renewal due dates and steps,milestone,Milestone for this renewal milestones record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+renewal_milestones,Policy renewal due dates and steps,due_date,Due date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+renewal_milestones,Policy renewal due dates and steps,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('open','planned','done'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,commitment_id,Stable commitment identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,description,Source or proposal description,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,owner_user_id,Stable owner user identifier or relationship reference,TEXT,,yes,users(user_id),REFERENCES users(user_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,due_date,Due date; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('open','overdue','done'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+commitments,Account follow-through obligations,source,Source for this commitments record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,rule_id,Stable rule identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,name,Name for this signal rules record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,signal_type,Signal type for this signal rules record,TEXT,,yes,,"CHECK (signal_type IN ('risk','opportunity','coverage_gap'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,severity,"Impact tier, separate from evidence confidence",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,condition_sql,Seeded rule expression metadata; not arbitrary runtime code execution,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,is_fact,Whether source-backed factual signal versus unverified hypothesis,BOOLEAN,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,min_evidence,Min evidence for this signal rules record,INTEGER,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,base_confidence,Base confidence for this signal rules record,"NUMERIC(4,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,active,Active for this signal rules record,BOOLEAN,,yes,,DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signal_rules,Rule metadata/configuration,description,Source or proposal description,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+source_reliability,Heuristic source reliability factors,source_system,"Synthetic provenance label, not a connected live integration",TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+source_reliability,Heuristic source reliability factors,score,Score for this source reliability record,"NUMERIC(4,2)",,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+source_reliability,Heuristic source reliability factors,note,Note for this source reliability record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+recency_bands,Age-to-confidence weighting,max_age_days,Max age days for this recency bands record,INTEGER,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+recency_bands,Age-to-confidence weighting,factor,Factor for this recency bands record,"NUMERIC(4,2)",,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,signal_id,Stable signal identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,signal_type,Signal type for this signals record,TEXT,,no,,"NOT NULL CHECK (signal_type IN ('risk','opportunity','coverage_gap'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,category,Category for this signals record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,title,Title for this signals record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,description,Source or proposal description,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,severity,"Impact tier, separate from evidence confidence",TEXT,,yes,,"CHECK (severity IN ('high','medium','low'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,is_fact,Whether source-backed factual signal versus unverified hypothesis,BOOLEAN,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,confidence,Heuristic score from0 to1; not a calibrated probability,"NUMERIC(4,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,assumptions,Conditions requiring client/human validation,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,rule_id,Stable rule identifier or relationship reference,TEXT,,yes,signal_rules(rule_id),REFERENCES signal_rules(rule_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,DEFAULT 'active',meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,created_at,Created at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+signals,Fact/hypothesis intelligence with confidence,confidence_breakdown,Derived JSON explaining confidence inputs,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,evidence_id,Stable evidence identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,signal_id,Stable signal identifier or relationship reference,TEXT,,no,signals(signal_id),NOT NULL REFERENCES signals(signal_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,source_table,Permitted polymorphic source collection,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,source_id,Record reference resolved within selected account,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,source_system,"Synthetic provenance label, not a connected live integration",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,snippet,Snippet for this evidence record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,recency_date,Source date used in age/confidence review,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,source_score,Source reliability factor,"NUMERIC(4,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,recency_factor,Age-based confidence multiplier,"NUMERIC(4,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+evidence,Traceable supporting source references,confidence,Heuristic score from0 to1; not a calibrated probability,"NUMERIC(4,2)",,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,contradiction_id,Stable contradiction identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,policy_id,Stable policy identifier or relationship reference,TEXT,,yes,policies(policy_id),REFERENCES policies(policy_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,field,Field for this contradictions record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,value_a,Value a for this contradictions record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,source_a,Source a for this contradictions record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,value_b,Value b for this contradictions record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,source_b,Source b for this contradictions record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,status,Record/workflow state constrained by service or DDL,TEXT,,yes,,"CHECK (status IN ('needs_review','resolved'))",meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,detected_at,Detected at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+contradictions,Conflicting source values for human review,resolved_at,Resolved at; source ISO date or runtime timestamp,DATE,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,brief_id,Stable brief identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,persona,Server-assigned producer/regional_leader context,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,version,Version for this briefs record,INTEGER,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,generated_at,Generated at; source ISO date or runtime timestamp,DATETIME,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,content_json,"Derived structured brief, not primary source input",TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,model_version,Model version for this briefs record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+briefs,Derived structured preparation history,completeness_check_passed,Stored validator result; current sources must still be rechecked,BOOLEAN,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,log_id,Stable log identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,user_id,Stable user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,account_id,Stable account identifier or relationship reference,TEXT,,yes,accounts(account_id),REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,persona,Server-assigned producer/regional_leader context,TEXT,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,action,Action for this audit log record,TEXT,,no,,NOT NULL DEFAULT 'brief_generation',meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,model,Model for this audit log record,TEXT,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,tokens_in,Known provider prompt-token usage,INTEGER,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,tokens_out,Known provider completion usage,INTEGER,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,total_tokens,Known provider total usage; no invented local tokens,INTEGER,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,cost_usd,"Configured price estimate in USD, not gateway invoice","NUMERIC(8,6)",,no,,NOT NULL DEFAULT 0.0,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,latency_ms,Measured operation latency in milliseconds,INTEGER,,no,,NOT NULL,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,completeness_passed,Programmatic claim-completeness result,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,blocked_flag,Blocked flag for this audit log record,BOOLEAN,,no,,NOT NULL DEFAULT 0,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,block_reason,Block reason for this audit log record,TEXT,,yes,,,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+audit_log,Measured generation usage and validation,created_at,Created at; source ISO date or runtime timestamp,DATETIME,,no,,NOT NULL DEFAULT CURRENT_TIMESTAMP,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,user_id,Stable user identifier or relationship reference,TEXT,yes,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,account_id,Stable account identifier or relationship reference,TEXT,yes,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,allowed,Explicit account access grant; ownership/region also required,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,can_view_policies,Explicit permission for policies,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,can_view_claims,Explicit permission for claims,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,can_view_service_cases,Explicit permission for service cases,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,can_view_billing,Explicit permission for billing,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+access_rules,Explicit user/account/resource permissions,can_view_documents,Explicit permission for documents,BOOLEAN,,no,,NOT NULL DEFAULT 1,meridian-api/sql/meridian_schema_and_seed_sqlite.sql
+auth_credentials,Salted password verifiers,user_id,Stable user identifier or relationship reference,TEXT,yes,no,users(user_id),PRIMARY KEY REFERENCES users(user_id),meridian-api/auth.py
+auth_credentials,Salted password verifiers,salt,Per-credential salt; never document actual values,TEXT,,no,,NOT NULL,meridian-api/auth.py
+auth_credentials,Salted password verifiers,password_hash,Salted PBKDF2 verifier; never expose value,TEXT,,no,,NOT NULL,meridian-api/auth.py
+auth_sessions,Hashed revocable sessions,token_hash,SHA256 session token digest; raw token is not stored,TEXT,yes,no,,PRIMARY KEY,meridian-api/auth.py
+auth_sessions,Hashed revocable sessions,user_id,Stable user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/auth.py
+auth_sessions,Hashed revocable sessions,csrf_token,Session-bound mutation verification token,TEXT,,no,,NOT NULL,meridian-api/auth.py
+auth_sessions,Hashed revocable sessions,expires_at,Server session expiry epoch,INTEGER,,no,,NOT NULL,meridian-api/auth.py
+login_failures,Credential-throttle counters,email,Email for this login failures record,TEXT,yes,no,,PRIMARY KEY,meridian-api/auth.py
+login_failures,Credential-throttle counters,attempts,Attempts for this login failures record,INTEGER,,no,,NOT NULL,meridian-api/auth.py
+login_failures,Credential-throttle counters,window_start,Window start for this login failures record,INTEGER,,no,,NOT NULL,meridian-api/auth.py
+security_events,Authentication and access event history,event_id,Stable event identifier or relationship reference,INTEGER,yes,no,,PRIMARY KEY AUTOINCREMENT,meridian-api/auth.py
+security_events,Authentication and access event history,user_id,Stable user identifier or relationship reference,TEXT,,yes,,,meridian-api/auth.py
+security_events,Authentication and access event history,account_id,Stable account identifier or relationship reference,TEXT,,yes,,,meridian-api/auth.py
+security_events,Authentication and access event history,event,Event for this security events record,TEXT,,no,,NOT NULL,meridian-api/auth.py
+security_events,Authentication and access event history,detail,Detail for this security events record,TEXT,,yes,,,meridian-api/auth.py
+security_events,Authentication and access event history,ts,Ts for this security events record,TEXT,,no,,NOT NULL DEFAULT CURRENT_TIMESTAMP,meridian-api/auth.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,job_id,Stable job identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,user_id,Stable user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,persona,Server-assigned producer/regional_leader context,TEXT,,no,,NOT NULL,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,source_fingerprint,"Hash binding data, permissions, user/persona and business date",TEXT,,no,,NOT NULL,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,status,Record/workflow state constrained by service or DDL,TEXT,,no,,NOT NULL,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,phase,Actual queued/collecting/generating/validating/completed/failed stage,TEXT,,no,,NOT NULL,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,message,Message for this brief generation jobs record,TEXT,,no,,NOT NULL,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,error,Error for this brief generation jobs record,TEXT,,yes,,,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,brief_id,Stable brief identifier or relationship reference,TEXT,,yes,,,meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,created_at,Created at; source ISO date or runtime timestamp,TEXT,,no,,"NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))",meridian-api/generation.py
+brief_generation_jobs,Scoped asynchronous generation lifecycle,updated_at,Updated at; source ISO date or runtime timestamp,TEXT,,no,,"NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))",meridian-api/generation.py
+client_actions,Pending human-reviewed proposals,action_id,Stable action identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,user_id,Stable user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,action_type,"Draft follow-up, review task or referral proposal",TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,title,Title for this client actions record,TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,description,Source or proposal description,TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,status,Record/workflow state constrained by service or DDL,TEXT,,no,,NOT NULL DEFAULT 'pending_approval',meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,source_fingerprint,"Hash binding data, permissions, user/persona and business date",TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,created_at,Created at; source ISO date or runtime timestamp,TEXT,,no,,"NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))",meridian-api/workflows.py
+client_actions,Pending human-reviewed proposals,decided_at,Timestamp of explicit one-shot approval/rejection,TEXT,,yes,,,meridian-api/workflows.py
+client_feedback,User decisions and corrections,feedback_id,Stable feedback identifier or relationship reference,TEXT,yes,no,,PRIMARY KEY,meridian-api/workflows.py
+client_feedback,User decisions and corrections,account_id,Stable account identifier or relationship reference,TEXT,,no,accounts(account_id),NOT NULL REFERENCES accounts(account_id),meridian-api/workflows.py
+client_feedback,User decisions and corrections,user_id,Stable user identifier or relationship reference,TEXT,,no,users(user_id),NOT NULL REFERENCES users(user_id),meridian-api/workflows.py
+client_feedback,User decisions and corrections,suggestion,Suggestion text reviewed by the user,TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_feedback,User decisions and corrections,decision,Accepted/rejected/corrected user feedback,TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_feedback,User decisions and corrections,correction,Required nonempty text when feedback is corrected,TEXT,,yes,,,meridian-api/workflows.py
+client_feedback,User decisions and corrections,source_fingerprint,"Hash binding data, permissions, user/persona and business date",TEXT,,no,,NOT NULL,meridian-api/workflows.py
+client_feedback,User decisions and corrections,created_at,Created at; source ISO date or runtime timestamp,TEXT,,no,,"NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))",meridian-api/workflows.py

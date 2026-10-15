@@ -1,0 +1,128 @@
+Ã¯Â»Â¿test_id,requirement,category,precondition,steps,expected_result,execution_status,evidence,limitation
+
+
+
+T01,FR-01,positive/security,Valid synthetic credentials,Sign in; restore session; sign out,Server role restored; logout revokes cookie,Historical pass,tests/test_workspaces.py,Before latest feature integration
+
+
+
+T02,FR-01,negative/security,Invalid credentials,Submit wrong password repeatedly; mutate without CSRF,401 then throttling; CSRF denial403,Historical pass,tests/test_workspaces.py,Before latest feature integration
+
+
+
+T03,FR-02,security,Producer Jordan,Read another producer's account; spoof query identity,403; no restricted record content,Historical pass,tests/test_workspaces.py,Before latest feature integration
+
+
+
+T04,FR-02,security,Priya permitted Harbor but no documents,Read documents and generated context,403 direct read; document evidence excluded,Historical pass,tests/test_agent_and_scenarios.py,Before latest feature integration
+
+
+
+T05,FR-04,functional,Regional Leader,Filter producer/risk/renewal horizon,Rows and KPI totals share authorized filtered scope,Historical pass,tests/test_workspaces.py,Before inline regional integration
+
+
+
+T06,FR-03,functional,Synthetic account source records,Open policies/claims/billing/service/documents,"Current source fields, loading/errors/empty states",Historical browser observation,docs/validation/hub-refresh/,Final palette/citation refinements postdate artifacts
+
+
+
+T07,FR-05,AI/grounding,Mocked valid structured provider,Generate then GET matching snapshot,Structured result reused without another model call,Historical pass,tests/test_generation.py,Before final seed lifecycle/context edits
+
+
+
+T08,FR-07,AI/mandatory,Horizon open CLM-88410,Generate output omitting claim,Validator detects omission; current source preparation includes claim,Historical pass,tests/test_agent_and_scenarios.py,Legacy fixture used only in isolated tests
+
+
+
+T09,FR-08,mandatory,Riverside Policy Admin/CRM dates differ,Load current brief,Both dates and reconciliation agenda preserved,Historical pass,tests/test_agent_and_scenarios.py,Before latest integration
+
+
+
+T10,FR-09,mandatory/low confidence,Cedar opportunity confidence below60%,Inspect hypothesis and evidence,Unverified label and assumptions; no autonomous recommendation,Historical pass,tests/test_agent_and_scenarios.py,Before latest integration
+
+
+
+T11,FR-10,AI/reliability,Blocked mocked provider worker,Start duplicate jobs; poll,202 before completion; one active job/model call; real phases,Historical pass,tests/test_generation.py,Before latest lifecycle edits
+
+
+
+T12,FR-10,AI/failure,Provider unavailable,Generate brief,Labeled deterministic fallback; no invented local model tokens,Historical pass,tests/test_generation.py,Final attempt-usage metadata needs recheck
+
+
+
+T13,FR-10,security/cache,Generated scoped narrative,Change document permission,Cached narrative suppressed; current permitted source cards,Historical pass,tests/test_generation.py,Before latest integration
+
+
+
+T14,FR-10,reliability,Background job throws error,Read existing cards; retry,Cards retained; new job can succeed,Historical pass,tests/test_generation.py,Before latest lifecycle edits
+
+
+
+T15,FR-15,live scenario,Isolated seeded database,Insert new high claim/date conflict; refresh,Rules/fingerprint/brief reflect new evidence without core code edit,Historical pass,tests/test_workspaces.py;tests/test_agent_and_scenarios.py,Never inject into user's real database
+
+
+
+T16,FR-06,AI/grounding,Provider outputs invented citation,Generate; inspect persisted brief,Unknown identifier rejected; no invented citation persisted,Historical pass,tests/test_generation.py,Before latest integration
+
+
+
+T17,FR-10,security,Accepted job owned by another user/account,Poll through unauthorized user/account,401/403/404; no cross-account result,Historical pass,tests/test_generation.py,Before latest integration
+
+
+
+T18,NFR-02,accessibility,Earlier UI artifact set,Run axe and keyboard drawer/tab checks,No recorded axe violations; focus returns and Escape closes,Historical observation,docs/validation/hub-refresh/accessibility.json,Not WCAG certification or latest regression result
+
+
+
+T19,NFR-02,responsive,390px viewport,Open sign-in/card/table/producer/AI views,No document overflow; input/select>=40px,Historical browser observation,meridian-ui/tests/browser_smoke.py,Latest palette/inline edits require rerun
+
+
+
+T20,FR-05,export,Horizon prepared brief,Print Letter PDF,One physical page; human-readable content,Historical observation,docs/validation/hub-refresh/client-brief.pdf,Latest print refinements require rerun
+
+
+
+T21,FR-16,security/UI,Producer and Leader sessions,Open executive URL and API,Producer403/API and denied UI; Leader200,Historical focused pass,docs/grounded-dashboard.md,Fixture only; final palette update not rerun
+
+
+
+T22,FR-11,grounding/security,Selected client with allowed evidence,Ask claim/date/service question and another-client question,Targeted cited source answer; cross-client request refused,UI scenario retired; historical/API evidence only,docs/validation/palette/backend-checks.json;retired UI capture;verification-evidence.md,"Question, review queue and feedback controls removed from Producer view; backend API evidence retained"
+
+
+
+T23,FR-11,negative,Missing evidence,Ask unsupported coverage/amount question,Explicit insufficient-data answer; no invented facts,Planned,new copilot API/UI,Not executed
+
+
+
+T24,FR-12,functional/approval,Permitted selected client,Save proposal; approve/reject specific pending action,Persisted explicit decision; no external execution,UI scenario retired; historical/API evidence only,docs/validation/palette/backend-checks.json;retired UI capture;verification-evidence.md,"Question, review queue and feedback controls removed from Producer view; backend API evidence retained"
+
+
+
+T25,FR-12,security/staleness,Pending action; sources changed,Approve then attempt duplicate/other-owner decision,Stale-source409; repeated/unauthorized decisions denied,UI scenario retired; historical/API evidence only,docs/validation/palette/backend-checks.json;retired UI capture;verification-evidence.md,"Question, review queue and feedback controls removed from Producer view; backend API evidence retained"
+
+
+
+T26,FR-13,feedback,Permitted suggestion,Accept/reject/correct; omit correction text,Scoped record; correction required; invalid request rejected,UI scenario retired; historical/API evidence only,docs/validation/palette/backend-checks.json;retired UI capture;verification-evidence.md,"Question, review queue and feedback controls removed from Producer view; backend API evidence retained"
+
+
+
+T27,FR-14,token/cost,Known/unknown provider usage,"Review successful, failed-attempt and local fallback telemetry",Known usage retained; unknown flagged; no invoice claim,Planned,agent.py;GET /admin/audit,Final metadata not executed
+
+
+
+T28,NFR-03,performance,Controlled delayed providers,Exercise shared deadline and loaded queue,Bounded calls; source cards usable; active work capped,Partially historical / load planned,generation tests + future load script,No throughput/p95 benchmark
+
+
+
+T29,NFR-05,lifecycle,Service restart after generated brief/job,Restart isolated backend; poll old job; regenerate,Source retained; runtime brief/job reset; 404 handled; version1,Planned,generation.py startup + UI hook,Current startup behaviour supersedes older recovery test
+
+
+
+T30,FR-04,integration,Regional Leader portfolio,Open the portfolio and select a client,"No inline leadership preparation or AI workflow cards; client portfolio, filters and timeline remain",Retired previous scenario; removal verified by source/type check,meridian-ui/src/RegionalDashboard.tsx,Shared Producer/client-brief features remain available; earlier inline screenshots are historical
+
+
+
+T31,NFR-02,usability/business,Representative users,Time manual and assisted preparation; review facts and actions,"Measured pilot baseline, task completion and correction rates",Planned,Pilot protocol,No proven business KPIs
+
+
+

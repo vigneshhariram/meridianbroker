@@ -1,0 +1,14 @@
+{
+  "account": "A03",
+  "mode": "live_ai",
+  "elapsed_seconds": 2.37,
+  "model": "genailab-maas-gpt-4o",
+  "retrieval": "sqlite_fts5",
+  "retrieved_records": 8,
+  "citations": [
+    "C05",
+    "E05"
+  ],
+  "tokens": 1460,
+  "fallback_reason": null
+}

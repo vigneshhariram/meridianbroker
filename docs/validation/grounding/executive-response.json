@@ -1,0 +1,214 @@
+{
+  "subtitle": "Midwest \u00b7 As of 08 Oct 2026",
+  "metadata": {
+    "source": "sqlite",
+    "as_of": "2026-10-08",
+    "scope": "Midwest",
+    "authorized_client_count": 9,
+    "producer_count": 2,
+    "period_start": "2025-11-01",
+    "period_end": "2026-10-08",
+    "metric_definitions": {
+      "written_premium": "Sum of authorized account annual_premium; current account snapshot, not period bookings.",
+      "commission_revenue": "Sum of posted commission_revenue within the period, requiring policy and billing access.",
+      "loss_ratio": "Sum of synthetic paid_losses / earned_premium for the same permitted policy-month rows; requires policies and claims access.",
+      "retention_rate": "Retained renewal outcomes / eligible renewal outcomes posted within the period.",
+      "carrier_mix": "Active accessible policy premium share by actual carrier; zero premium yields zero shares.",
+      "commission_average": "Average across months with posted accessible commission records; not an assumed 12-month average."
+    },
+    "notes": [
+      "Financial ledger and prior-renewal outcomes are explicitly synthetic demo facts attached to existing policies/accounts; no screenshot totals or fictional producers are used.",
+      "Synthetic financial seed: monthly earned premium = annual policy premium / 12; commission = 12% of earned premium; paid losses = 35% of earned premium. These are demo assumptions, not observed claims payments.",
+      "Historical renewal outcomes are synthetic retained outcomes for existing accounts; the small sample does not estimate future retention.",
+      "Policy charts use active accessible policy premiums. Written premium uses authorized account annual premiums; sums can differ when source records or permissions differ.",
+      "The current month is partial. Missing ledger months are omitted, not treated as zero. Demo ledger coverage ends October 2026; later data requires new posted records."
+    ]
+  },
+  "kpis": [
+    {
+      "label": "Written Premium",
+      "value": "$5.44M",
+      "raw_value": 5440000.0,
+      "change": "9 authorized clients \u00b7 current annual premium",
+      "color": "blue"
+    },
+    {
+      "label": "Commission Revenue",
+      "value": "$571.5K",
+      "raw_value": 571500.0,
+      "change": "Posted synthetic ledger \u00b7 trailing period",
+      "color": "purple"
+    },
+    {
+      "label": "Loss Ratio",
+      "value": "35.0%",
+      "raw_value": 35.0,
+      "change": "Synthetic paid losses / earned premium",
+      "color": "green"
+    },
+    {
+      "label": "Retention Rate",
+      "value": "100.0%",
+      "raw_value": 100.0,
+      "change": "9 synthetic renewal outcomes",
+      "color": "amber"
+    }
+  ],
+  "premium_by_line": [
+    {
+      "label": "Property",
+      "premium": 2540000.0,
+      "color": "blue"
+    },
+    {
+      "label": "General Liability",
+      "premium": 670000.0,
+      "color": "green"
+    },
+    {
+      "label": "Professional Liability",
+      "premium": 520000.0,
+      "color": "amber"
+    },
+    {
+      "label": "Commercial Auto Fleet",
+      "premium": 480000.0,
+      "color": "purple"
+    },
+    {
+      "label": "Workers Comp",
+      "premium": 420000.0,
+      "color": "coral"
+    },
+    {
+      "label": "Builders Risk",
+      "premium": 400000.0,
+      "color": "gray"
+    },
+    {
+      "label": "Product Liability",
+      "premium": 270000.0,
+      "color": "blue"
+    },
+    {
+      "label": "Cyber",
+      "premium": 140000.0,
+      "color": "green"
+    }
+  ],
+  "carrier_mix": {
+    "total": 4,
+    "carriers": [
+      {
+        "name": "Atlas Casualty",
+        "premium": 1940000.0,
+        "percentage": 35.66,
+        "color": "blue"
+      },
+      {
+        "name": "Northgate Mutual",
+        "premium": 1800000.0,
+        "percentage": 33.09,
+        "color": "green"
+      },
+      {
+        "name": "Keystone Re",
+        "premium": 960000.0,
+        "percentage": 17.65,
+        "color": "amber"
+      },
+      {
+        "name": "Pioneer Specialty",
+        "premium": 740000.0,
+        "percentage": 13.6,
+        "color": "purple"
+      }
+    ]
+  },
+  "commission_trend": {
+    "months": [
+      {
+        "month": "Nov",
+        "label": "Nov 2025",
+        "value": 15900.0
+      },
+      {
+        "month": "Dec",
+        "label": "Dec 2025",
+        "value": 33300.0
+      },
+      {
+        "month": "Jan",
+        "label": "Jan 2026",
+        "value": 43000.0
+      },
+      {
+        "month": "Feb",
+        "label": "Feb 2026",
+        "value": 47000.0
+      },
+      {
+        "month": "Mar",
+        "label": "Mar 2026",
+        "value": 51500.0
+      },
+      {
+        "month": "Apr",
+        "label": "Apr 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "May",
+        "label": "May 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "Jun",
+        "label": "Jun 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "Jul",
+        "label": "Jul 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "Aug",
+        "label": "Aug 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "Sep",
+        "label": "Sep 2026",
+        "value": 54400.0
+      },
+      {
+        "month": "Oct",
+        "label": "Oct 2026",
+        "value": 54400.0
+      }
+    ],
+    "latest_label": "Oct 2026",
+    "latest": 54400.0,
+    "average": 47625.0,
+    "period_label": "Nov 2025 \u2013 Oct 2026 (through 08 Oct)"
+  },
+  "top_producers": [
+    {
+      "producer_id": "U1",
+      "name": "Jordan Davis",
+      "client_count": 5,
+      "premium": 3330000.0,
+      "retention": 100.0,
+      "commission": 356200.0
+    },
+    {
+      "producer_id": "U2",
+      "name": "Priya Nair",
+      "client_count": 4,
+      "premium": 2110000.0,
+      "retention": 100.0,
+      "commission": 215300.0
+    }
+  ]
+}

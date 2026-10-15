@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "source seed has no AI narratives",
+    "Pinecrest offline completeness",
+    "source-based claims/opportunities/endorsements",
+    "cross-client denial",
+    "persist and approve action",
+    "duplicate/stale approval denial",
+    "correction persistence and validation",
+    "producer executive and cross-region denial"
+  ],
+  "database": "isolated in-memory; source seed DROP statements excluded; app lifespan not run",
+  "additional_checks": [
+    "reject blank structured summary",
+    "overdue renewal wording",
+    "stale draft denied before submission"
+  ]
+}

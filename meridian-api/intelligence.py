@@ -1,5 +1,6 @@
 """Account-scoped, rule-based intelligence computed from current relational records."""
 
+import hashlib
 import json
 import sqlite3
 from datetime import date
@@ -435,31 +436,93 @@ def build_brief(
             )
         ]
 
+    fingerprint_payload = {
+        "schema": 2,
+        "user_id": user.user_id,
+        "persona": user.persona,
+        "as_of": as_of.isoformat(),
+        "permissions": permissions,
+        "account": account,
+        "contact": dict(primary) if primary else None,
+        "sources": {
+            table: sorted(rows, key=lambda row: str(row[SOURCE_KEYS[table]]))
+            for table, rows in data.items()
+        },
+        "risks": risks,
+        "opportunities": opportunities,
+        "contradictions": contradictions,
+        "milestones": milestone_rows,
+    }
+    source_fingerprint = hashlib.sha256(
+        json.dumps(fingerprint_payload, sort_keys=True, default=str).encode()
+    ).hexdigest()
     latest = connection.execute(
-        "SELECT * FROM briefs WHERE account_id=? AND persona=? ORDER BY version DESC,generated_at DESC LIMIT 1",
-        (account_id, user.persona),
+        """SELECT * FROM briefs WHERE account_id=? AND persona=?
+        ORDER BY CASE WHEN json_valid(content_json) THEN COALESCE(
+            json_extract(content_json,'$.generation_scope.user_id')=? AND
+            json_extract(content_json,'$.generation_scope.source_fingerprint')=?,0)
+            ELSE 0 END DESC, version DESC,generated_at DESC LIMIT 1""",
+        (account_id, user.persona, user.user_id, source_fingerprint),
     ).fetchone()
+    # A persona is not a security boundary: generations belong to an exact user
+    # and accessible source snapshot. Unscoped seed narratives are never reused.
     latest_content = {}
     telemetry = None
+    stale = True
+    generation_reason = "Generate a fresh synthesis from the accessible source records."
     if latest and latest["content_json"]:
         raw_json = latest["content_json"]
-        latest_content = json.loads(raw_json) if isinstance(raw_json, str) else raw_json
-        if isinstance(latest_content, dict) and "telemetry" in latest_content:
-            telemetry = latest_content["telemetry"]
-    omitted_item = latest_content.get("omitted") if isinstance(latest_content, dict) else None
+        try:
+            candidate_content = json.loads(raw_json) if isinstance(raw_json, str) else raw_json
+        except (ValueError, TypeError):
+            candidate_content = {}
+        if not isinstance(candidate_content, dict):
+            candidate_content = {}
+        scope = candidate_content.get("generation_scope", {})
+        if not isinstance(scope, dict):
+            scope = {}
+        if (
+            scope.get("user_id") == user.user_id
+            and scope.get("source_fingerprint") == source_fingerprint
+        ):
+            latest_content = candidate_content
+            telemetry = latest_content.get("telemetry")
+            stale = False
+            generation_reason = (telemetry or {}).get("fallback_reason")
+        elif scope.get("user_id") == user.user_id:
+            generation_reason = (
+                "Source records or permissions changed. Showing current source-based preparation."
+            )
+        else:
+            generation_reason = "Showing current source-based preparation. The saved sample has not been verified for your records."
 
-    # Check brief completeness check: passed if permissions exist and no omission
-    completeness_passed = (
-        bool(latest["completeness_check_passed"])
-        if latest and latest["completeness_check_passed"] is not None
-        else permissions["claims"]
-    )
-    if omitted_item:
-        completeness_passed = False
+    omitted_item = None
+    # Re-evaluate against current accessible claims; never trust a saved boolean.
+    reviewed = len(open_claims)
+    if latest_content:
+        narrative = " ".join(
+            [latest_content.get("summary", ""), *latest_content.get("prioritized_risks", [])]
+        )
+        citations = latest_content.get("evidence_citations", [])
+        omitted_claims = [
+            clm["claim_number"]
+            for clm in open_claims
+            if clm["claim_number"] not in citations or clm["claim_number"] not in narrative
+        ]
+        if omitted_claims:
+            reviewed -= len(omitted_claims)
+            omitted_item = ", ".join(omitted_claims)
+            stale = True
+            latest_content = {}
+            telemetry = None
+            generation_reason = "The saved synthesis omitted accessible claims. Showing current source-based preparation."
+            # Source-based cards below cover every accessible claim immediately.
+            omitted_item = None
+            reviewed = len(open_claims)
 
-    claim_review_complete = bool(permissions["claims"] and completeness_passed)
+    claim_review_complete = bool(permissions["claims"])
     claim_review = {
-        "reviewed": max(0, len(open_claims) - (1 if omitted_item else 0)),
+        "reviewed": reviewed,
         "total": len(open_claims),
         "complete": claim_review_complete,
         "omitted": omitted_item,
@@ -514,11 +577,16 @@ def build_brief(
         )
     else:
         default_talking_points.append(
-            f"Confirmed fact: Account status is {risk_level} risk with {days or 'unknown'} days to renewal."
+            f"Confirmed fact: Account status is {risk_level} risk with {days if days is not None else 'unknown'} days to renewal."
         )
     for clm in open_claims:
+        reserve_note = (
+            f"has a ${float(clm['reserve_amount']):,.0f} recorded reserve"
+            if clm.get("reserve_amount") is not None
+            else "has no reserve amount recorded"
+        )
         default_talking_points.append(
-            f"Confirmed fact: Open claim {clm['claim_number']} ({clm['summary']}) has active reserve and requires underwriter review."
+            f"Confirmed fact: Open claim {clm['claim_number']} ({clm['summary']}) {reserve_note}; review with the underwriter."
         )
     for c in contradictions:
         default_talking_points.append(
@@ -555,7 +623,8 @@ def build_brief(
     talking_points = latest_content.get("talking_points") or default_talking_points
     prioritized_risks = (
         latest_content.get("prioritized_risks")
-        or [s["title"] for s in risks[:4]]
+        or [f"Open claim {clm['claim_number']}: {clm['summary']}" for clm in open_claims]
+        + [s["title"] for s in risks[:4]]
         or ["No material operational risk flags identified."]
     )
     opportunity_hypotheses = latest_content.get("opportunity_hypotheses") or [
@@ -566,7 +635,9 @@ def build_brief(
     evidence_citations = (
         latest_content.get("evidence_citations")
         or latest_content.get("evidence_ids")
-        or [clm["claim_number"] for clm in open_claims] + [p["policy_id"] for p in policies]
+        or [clm["claim_number"] for clm in open_claims]
+        + [p["policy_id"] for p in policies]
+        + [s["signal_id"] for s in [*risks, *opportunities]]
     )
 
     # Grounded summary: honor stored AI brief or live dynamic updates
@@ -592,7 +663,9 @@ def build_brief(
             "persona": user.persona,
             "version": latest["version"],
             "generated_at": latest["generated_at"],
-            "content_json": latest_content
+            "content_json": {
+                key: value for key, value in latest_content.items() if key != "generation_scope"
+            }
             or {
                 "summary": active_summary,
                 "agenda": agenda,
@@ -651,6 +724,18 @@ def build_brief(
         "timeline": timeline,
         "permissions": permissions,
         "summary": active_summary,
+        "generation": {
+            "mode": "offline"
+            if not stale and (telemetry or {}).get("model") == "offline-deterministic"
+            else "stored_ai"
+            if not stale
+            else "rules",
+            "stale": stale,
+            "reason": generation_reason,
+            "can_generate": True,
+            "source_fingerprint": source_fingerprint,
+            "generated_at": latest["generated_at"] if latest and not stale else None,
+        },
     }
     return result
 
@@ -754,19 +839,52 @@ def build_agent_input_context(
         account_id=account_id,
         account_name=account["name"],
         industry=account.get("industry"),
-        annual_premium=float(account["annual_premium"]) if account.get("annual_premium") else None,
+        annual_premium=float(account["annual_premium"])
+        if account.get("annual_premium") is not None
+        else None,
         days_to_renewal=brief_data.get("days_to_renewal"),
-        risk_level=account.get("risk_level") or "low",
+        risk_level=brief_data["account"].get("risk_level") or "low",
         persona=persona or user.persona,
         primary_contact=primary,
         policies=policy_contexts,
         open_claims=claim_contexts,
-        open_service_cases=data["service_cases"],
-        overdue_commitments=[c for c in data["commitments"] if c.get("status") == "overdue"],
-        overdue_invoices=[b for b in data["billing"] if b.get("status") == "overdue"],
+        open_service_cases=[row for row in data["service_cases"] if row.get("status") == "open"],
+        pending_endorsements=[
+            row for row in data["endorsements"] if row.get("status") == "pending"
+        ],
+        overdue_commitments=[c for c in brief_data["commitments"] if c.get("status") == "overdue"],
+        overdue_invoices=[
+            row
+            for row in data["billing"]
+            if row.get("status") == "overdue"
+            or (
+                row.get("status") == "due"
+                and row.get("due_date")
+                and date.fromisoformat(row["due_date"]) < as_of
+            )
+        ],
         milestones=brief_data.get("milestones", []),
         risks=risk_contexts,
         opportunities=opp_contexts,
         contradictions=contra_contexts,
         restricted_resources=[res for res, allowed in permissions.items() if not allowed],
+        allowed_citation_ids=sorted(
+            {str(row[SOURCE_KEYS[table]]) for table, rows in data.items() for row in rows}
+            | {
+                row[field]
+                for rows in data.values()
+                for row in rows
+                for field in ("claim_number", "case_number")
+                if row.get(field)
+            }
+            | {
+                signal["signal_id"]
+                for signal in [*brief_data["risks"], *brief_data["opportunities"]]
+            }
+            | {
+                ev["evidence_id"]
+                for signal in [*brief_data["risks"], *brief_data["opportunities"]]
+                for ev in signal.get("evidence", [])
+            }
+        ),
     )

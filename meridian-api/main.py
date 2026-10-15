@@ -1,8 +1,6 @@
-import json
 import logging
 import os
 import sqlite3
-import uuid
 from contextlib import asynccontextmanager, closing
 from datetime import date
 from pathlib import Path
@@ -14,12 +12,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from access import allowed_accounts, authorize, log_security, verify_identity
 from agent import ClientIntelligenceAgent
 from auth import AuthService, SessionUser, initialize_security
+from generation import (
+    generate_account,
+    get_job,
+    initialize_generation,
+    reset_generated_state,
+    shutdown_generation,
+    start_job,
+)
 from init_db import init_database
-from intelligence import build_agent_input_context, build_brief
+from intelligence import build_brief
 from models import (
     Account,
     AccountBrief,
     Billing,
+    BriefGenerationJob,
+    BriefGenerationRequest,
     Claim,
     Document,
     Policy,
@@ -32,7 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = Path(os.getenv("SQLITE_DB_PATH", BASE_DIR / "meridian.db"))
 # Configurable demo clock: synthetic October records remain reproducible.
 AS_OF_DATE = date.fromisoformat(os.getenv("MERIDIAN_AS_OF_DATE", "2026-10-08"))
-RESET_DB_ON_START = os.getenv("RESET_DB_ON_START", "1").lower() in ("1", "true", "yes")
+RESET_DB_ON_START = os.getenv("RESET_DB_ON_START", "0").lower() in ("1", "true", "yes")
 
 
 @asynccontextmanager
@@ -45,7 +53,14 @@ async def lifespan(app: FastAPI):
         init_database(DB_PATH, force_recreate=True)
     elif not DB_PATH.exists():
         init_database(DB_PATH, force_recreate=False)
-    yield
+    with closing(_get_database_connection()) as connection:
+        initialize_generation(connection)
+        reset_generated_state(connection)
+        logger.info("Started fresh briefing session; source records and real audit history preserved.")
+    try:
+        yield
+    finally:
+        shutdown_generation(wait=True)
 
 
 app = FastAPI(title="Meridian Broker API", version="0.2.0", lifespan=lifespan)
@@ -158,78 +173,32 @@ def generate_account_brief(
     account_id: str,
     user: SessionUser = Depends(auth.require_user),
 ):
-    with closing(_get_database_connection()) as connection:
-        authorize(connection, user, account_id)
-        context = build_agent_input_context(connection, user, account_id, AS_OF_DATE)
-        with ClientIntelligenceAgent() as agent:
-            output, telemetry, passed, reason = agent.generate_brief(context)
+    return generate_account(
+        _get_database_connection, user, account_id, AS_OF_DATE, ClientIntelligenceAgent
+    )
 
-        # Determine next version
-        row = connection.execute(
-            "SELECT version FROM briefs WHERE account_id=? AND persona=? ORDER BY version DESC LIMIT 1",
-            (account_id, user.persona),
-        ).fetchone()
-        next_version = (row["version"] + 1) if row else 1
 
-        content_dict = {
-            "summary": output.executive_summary,
-            "agenda": output.agenda,
-            "talking_points": output.talking_points,
-            "prioritized_risks": output.prioritized_risks,
-            "opportunity_hypotheses": output.opportunity_hypotheses,
-            "suggested_actions": [a.model_dump() for a in output.suggested_actions],
-            "evidence_citations": output.evidence_citations,
-            "telemetry": telemetry.model_dump(),
-        }
-        if not passed and reason:
-            content_dict["omitted"] = reason
+@app.post("/accounts/{account_id}/brief/jobs", response_model=BriefGenerationJob, status_code=202)
+def start_brief_generation(
+    account_id: str,
+    request: BriefGenerationRequest | None = None,
+    user: SessionUser = Depends(auth.require_user),
+):
+    return start_job(
+        _get_database_connection,
+        user,
+        account_id,
+        AS_OF_DATE,
+        force=request.force if request else False,
+        agent_factory=ClientIntelligenceAgent,
+    )
 
-        brief_id = f"BR_{uuid.uuid4().hex[:8]}"
-        connection.execute(
-            """
-            INSERT INTO briefs (brief_id, account_id, persona, version, generated_at, content_json, model_version, completeness_check_passed)
-            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)
-            """,
-            (
-                brief_id,
-                account_id,
-                user.persona,
-                next_version,
-                json.dumps(content_dict),
-                telemetry.model,
-                1 if passed else 0,
-            ),
-        )
 
-        log_id = f"LOG_{uuid.uuid4().hex[:8]}"
-        connection.execute(
-            """
-            INSERT INTO audit_log (log_id, user_id, account_id, persona, action, model, tokens_in, tokens_out, total_tokens, cost_usd, latency_ms, completeness_passed, blocked_flag, block_reason)
-            VALUES (?, ?, ?, ?, 'brief_generation', ?, ?, ?, ?, ?, ?, ?, 0, NULL)
-            """,
-            (
-                log_id,
-                user.user_id,
-                account_id,
-                user.persona,
-                telemetry.model,
-                telemetry.tokens_in,
-                telemetry.tokens_out,
-                telemetry.total_tokens,
-                telemetry.cost_usd,
-                telemetry.latency_ms,
-                1 if passed else 0,
-            ),
-        )
-        connection.commit()
-        log_security(
-            connection,
-            user,
-            "brief_generated",
-            account_id,
-            detail=f"v{next_version} by {telemetry.model}",
-        )
-        return build_brief(connection, user, account_id, AS_OF_DATE)
+@app.get("/accounts/{account_id}/brief/jobs/{job_id}", response_model=BriefGenerationJob)
+def get_brief_generation(
+    account_id: str, job_id: str, user: SessionUser = Depends(auth.require_user)
+):
+    return get_job(_get_database_connection, user, account_id, job_id, AS_OF_DATE)
 
 
 @app.get("/portfolio")
@@ -252,21 +221,30 @@ def get_audit_telemetry(
     user: SessionUser = Depends(auth.require_user),
 ):
     with closing(_get_database_connection()) as connection:
+        # Producers see their own usage; leaders see only authorized regional accounts.
+        accessible = [row["account_id"] for row in allowed_accounts(connection, user)]
+        placeholders = ",".join("?" for _ in accessible) or "NULL"
+        scope = f"account_id IN ({placeholders})"
+        params = list(accessible)
+        if user.persona != "regional_leader":
+            scope += " AND user_id=?"
+            params.append(user.user_id)
         stats = connection.execute(
-            """
+            f"""
             SELECT
                 COUNT(*) as total_calls,
                 COALESCE(SUM(total_tokens), 0) as total_tokens,
                 COALESCE(SUM(cost_usd), 0.0) as total_cost_usd,
                 COALESCE(AVG(latency_ms), 0) as avg_latency_ms
             FROM audit_log
-            """
+            WHERE {scope}
+            """,
+            params,
         ).fetchone()
 
         rows = connection.execute(
-            """
-            SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 50
-            """
+            f"SELECT * FROM audit_log WHERE {scope} ORDER BY created_at DESC LIMIT 50",
+            params,
         ).fetchall()
 
         return {
